@@ -2,17 +2,15 @@ import threading
 import Queue
 import time
 
-from Pro1 import Pro1
+#from LL3Threaded.LidarLiteChild import LidarLiteChild
+from LidarLiteChild import LidarLiteChild
 from Pro2 import Pro2
 from Con1 import Con1
 
-global isDone
 
-isDone = False
+pro1 = LidarLiteChild()
+pro1.init()
 
-
-
-pro1 = Pro1()
 pro2 = Pro2()
 con1 = Con1()
 con2 = Con1()
@@ -39,14 +37,29 @@ print "Recieved quit command:"
 
 pro1.terminate()
 pro2.terminate()
+
+
+time.sleep(1)
 con1.terminate()
 con2.terminate()
 print "terminated 4 threads"
 
-qNumbers.join()
+
 qCommands.join()
+print "joined 1 queue(s)"
 qQuit.join()
-print "joined 3 queues"
+print "joined 2 queue(s)"
+
+
+
+if qNumbers.empty():
+    print "Queue appears to be empty"
+else:
+    print "Queue size: ", qNumbers.qsize()
+
+
+qNumbers.join()
+print "joined 3 queue(s)"
 
 
 print "Bye!"

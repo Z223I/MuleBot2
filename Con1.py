@@ -2,8 +2,6 @@ import threading
 import Queue
 import time
 
-global isDone
-
 class Con1():
     """
     Consumes two streams of data.
@@ -11,7 +9,6 @@ class Con1():
 
     def __init__(self):
         self._running = True
-        isDone = False
 
     def terminate(self):
         self._running = False
@@ -23,7 +20,7 @@ class Con1():
             number = _q1.get();
             print number
             print
-            time.sleep(3)
+#            time.sleep(3)
             _q1.task_done()
  
 
