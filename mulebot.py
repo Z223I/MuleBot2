@@ -203,9 +203,11 @@ class MuleBot:
                 if command == 'h':
                   time.sleep(.001) #Basically do nothing
                 elif command == 'p':
-                  self.dcMotorLeftTurn (  ord(cmd[1]) - ord('0')  )
+                  count = int( filter( str.isdigit, cmd ) )
+                  self.dcMotorLeftTurn (  count  )
                 elif command == 's':
-                  self.dcMotorRightTurn(  ord(cmd[1]) - ord('0')  )
+                  count = int( filter( str.isdigit, cmd ) )
+                  self.dcMotorRightTurn( count  )
                 elif command == 't':
                   self.test()
                 elif command == 'f' or command == 'r':
@@ -214,7 +216,8 @@ class MuleBot:
                   self.setMotorsDirection(direction)
 
             #      print cmd[1]
-                  count = ord(cmd[1]) - ord('0')
+                  #count = ord(cmd[1]) - ord('0')
+                  count = int( filter( str.isdigit, cmd ) )
                   self.motorSpeed(count)
 
                 else:
