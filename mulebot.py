@@ -6,13 +6,18 @@ import time
 #channel = 6
 
 import RPi.GPIO as GPIO
-
+import threading
+import Queue
 
 
 class MuleBot:
   def __init__(self):
 
     global GPIO
+
+    # running is used to control thread execution.
+    self._running = True
+
     self.pwmEnablePin       = 16 # Broadcom pin 16
     self.motor1DirectionPin = 20 # Broadcom pin 20
     self.motor2DirectionPin = 21 # Broadcom pin 21
@@ -57,6 +62,10 @@ class MuleBot:
 
     #count = 1
     self.pwm.setPWMFreq(1000)                        # Set frequency to 1000 Hz
+
+
+  def terminate(self):
+    self._running = False
 
 
   # I don't think setServoPulse is ever called.
@@ -167,6 +176,65 @@ class MuleBot:
     self.dcMotorPWMDurationRight = 0
 
 
+
+  def run1(self, _q1):
+      while self._running:
+          name = threading.currentThread().getName()
+          print "Consumer thread 1:  ", name
+          number = _q1.get();
+          print number
+          print
+          _q1.task_done()
+ 
+
+  def run2(self, _q2):
+        while self._running:
+                name = threading.currentThread().getName()
+                print "Consumer thread 2:  ", name
+                qCommand = _q2.get();
+                print "Here is the command... ", qCommand
+                print
+
+
+                # Change speed of motors
+                cmd = qCommand
+                command = cmd[0]
+
+                if command == 'p':
+                  self.dcMotorLeftTurn (  ord(cmd[1]) - ord('0')  )
+                elif command == 's':
+                  self.dcMotorRightTurn(  ord(cmd[1]) - ord('0')  )
+                elif command == 't':
+                  self.test()
+                elif command == 'f' or command == 'r':
+                  direction = command
+                  print direction
+                  self.setMotorsDirection(direction)
+
+            #      print cmd[1]
+                  count = ord(cmd[1]) - ord('0')
+                  self.motorSpeed(count)
+
+                else:
+                  print "Invalid input: ", command
+                  print "Please try again."
+
+
+                #time.sleep(4)
+                _q2.task_done()
+        # End while
+
+
+        time.sleep(2)
+        self.shutdown()
+
+
+
+
+
+
+
+
   def setMotorsDirection(self, _direction):
     if _direction == 'f' or _direction == 'F':
       self.motorDirection(self.motor1DirectionPin, self.motorForward)
@@ -272,64 +340,3 @@ def test():
   singleDeltaTime = totalDeltaTime / maxEvents
   print singleDeltaTime, " * ", maxEvents, " = ", totalDeltaTime
 
-
-#setMotorsDirection('f')
-# End GPIO
-
-# ===========================================================================
-# Example Code
-# ===========================================================================
-
-
-
-
-
-mb = MuleBot()
-
-
-doContinue = True
-
-try:
-  while (doContinue):
-
-    # Change speed of motors
-    cmd = raw_input(":;<  Command, f/r 0..9, E.g. f5: ")
-    command = cmd[0]
-
-    if command == 'h':
-      doContinue = False
-    elif command == 'p':
-      mb.dcMotorLeftTurn (  ord(cmd[1]) - ord('0')  )
-    elif command == 's':
-      mb.dcMotorRightTurn(  ord(cmd[1]) - ord('0')  )
-    elif command == 't':
-      test()
-    elif command == 'f' or command == 'r':
-      direction = command
-      print direction
-      mb.setMotorsDirection(direction)
-
-#      print cmd[1]
-      count = ord(cmd[1]) - ord('0')
-      mb.motorSpeed(count)
-
-    else:
-      print "Invalid input: ", command
-      print "Please try again."
-
-#      time.sleep(1)
-#      count += 1
-#    if count > motorMaxRPM:
-#      count = 0
-
-except KeyboardInterrupt:
-  # This statement is meaningless other than it allows the program to
-  # drop down to the next line.
-  count = 0
-
-
-
-mb.shutdown()
-# exception keyboard
-# cleanup pwm
-#pwm.cleanup()

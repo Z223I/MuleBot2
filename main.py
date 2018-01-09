@@ -5,7 +5,9 @@ import time
 #from LL3Threaded.LidarLiteChild import LidarLiteChild
 from LidarLiteChild import LidarLiteChild
 from Pro2 import Pro2
-from Con1 import Con1
+
+#from Con1 import Con1
+from mulebot import MuleBot as Con1
 
 
 lidarLiteChild = LidarLiteChild()
@@ -37,9 +39,6 @@ print "Recieved quit command:"
 
 lidarLiteChild.terminate()
 pro2.terminate()
-
-
-time.sleep(1)
 con1.terminate()
 con2.terminate()
 print "terminated 4 threads"
@@ -49,15 +48,6 @@ qCommands.join()
 print "joined 1 queue(s)"
 qQuit.join()
 print "joined 2 queue(s)"
-
-
-
-if qNumbers.empty():
-    print "Queue appears to be empty"
-else:
-    print "Queue size: ", qNumbers.qsize()
-
-
 qNumbers.join()
 print "joined 3 queue(s)"
 

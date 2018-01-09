@@ -19,6 +19,6 @@ class Pro2():
             print "Producer thread:  ", name
             _q.put(command)
             print command
-            if command[0] == 'q' or command[0] == 'Q':
+            if command[0] == 'h' or command[0] == 'H':
                 _qQuit.put(command)
                 break
