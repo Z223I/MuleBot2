@@ -11,12 +11,16 @@ import Queue
 
 
 class MuleBot:
+
   def __init__(self):
 
     global GPIO
 
     # running is used to control thread execution.
     self._running = True
+
+    # Keep MuleBot parallel to the wall at this distance.
+    self.distanceToWall = 0
 
     self.pwmEnablePin       = 16 # Broadcom pin 16
     self.motor1DirectionPin = 20 # Broadcom pin 20
@@ -177,17 +181,48 @@ class MuleBot:
 
 
 
-  def run1(self, _q1):
+  def run1(self, _q1, _qWallDistance):
       while self._running:
-          name = threading.currentThread().getName()
-          print "Consumer thread 1:  ", name
+          #name = threading.currentThread().getName()
+          #print "Consumer thread 1:  ", name
+
+          # This method is the only consumer of _qWallDistance.
+          # Therefore checking if the queue is empty works.
+          # In a multi-consumer environment, check empty()
+          # can cause a race condition.
+          if _qWallDistance.empty():
+              pass
+          else:
+              self.distanceToWall = _qWallDistance.get()
+              _qWallDistance.task_done()
+
+
+
+
+
+
           number = _q1.get();
-          print number
-          print
+          print "Current distance: ", number
+
+          # Are we navigating?
+          navigating = (self.distanceToWall > 0)
+          if navigating:
+              print "Desired distance: ", self.distanceToWall
+
+              accuracy = 1.5
+              # Navigate
+              if number < self.distanceToWall - accuracy:
+                  print "Turn right >>>"
+              elif number > self.distanceToWall + accuracy:
+                  print "Turn left <<<"
+              else:
+                  print "On path."
+          # end if 
+
           _q1.task_done()
  
 
-  def run2(self, _q2):
+  def run2(self, _q2, _qWallDistance):
         while self._running:
                 name = threading.currentThread().getName()
                 print "Consumer thread 2:  ", name
@@ -201,7 +236,7 @@ class MuleBot:
                 command = cmd[0]
 
                 if command == 'h':
-                  time.sleep(.001) #Basically do nothing
+                  pass
                 elif command == 'p':
                   count = int( filter( str.isdigit, cmd ) )
                   self.dcMotorLeftTurn (  count  )
@@ -219,7 +254,9 @@ class MuleBot:
                   #count = ord(cmd[1]) - ord('0')
                   count = int( filter( str.isdigit, cmd ) )
                   self.motorSpeed(count)
-
+                elif command == 'd':
+                  inches = int( filter( str.isdigit, cmd ) )
+                  _qWallDistance.put( inches )
                 else:
                   print "Invalid input: ", command
                   print "Please try again."

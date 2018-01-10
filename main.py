@@ -17,14 +17,15 @@ pro2 = Pro2()
 con1 = Con1()
 con2 = Con1()
 
-qNumbers  = Queue.Queue(maxsize=0)
-qCommands = Queue.Queue(maxsize=0)
-qQuit     = Queue.Queue(maxsize=0)
+qNumbers      = Queue.Queue(maxsize=0)
+qCommands     = Queue.Queue(maxsize=0)
+qQuit         = Queue.Queue(maxsize=0)
+qWallDistance = Queue.Queue(maxsize=0)
 
 lidarLiteChildThread  = threading.Thread(target=lidarLiteChild.run, args=(qNumbers,))
 pro2Thread  = threading.Thread(target=pro2.run, args=(qCommands, qQuit, ))
-con1Thread1 = threading.Thread(target=con1.run1, args=(qNumbers,))
-con2Thread2 = threading.Thread(target=con2.run2, args=(qCommands, ))
+con1Thread1 = threading.Thread(target=con1.run1, args=(qNumbers, qWallDistance))
+con2Thread2 = threading.Thread(target=con2.run2, args=(qCommands, qWallDistance ))
 
 lidarLiteChildThread.start()
 pro2Thread.start()
@@ -50,6 +51,8 @@ qQuit.join()
 print "joined 2 queue(s)"
 qNumbers.join()
 print "joined 3 queue(s)"
+qWallDistance.join()
+print "joined 4 queue(s)"
 
 
 print "Bye!"
