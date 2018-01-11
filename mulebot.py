@@ -108,7 +108,7 @@ class MuleBot:
 
   def dcMotorLeftTurn(self, duration):
     print ("From dcMotorLeftTurn: ", self.dcMotorPWMDurationLeft)
-    tempPWMDurationLeft = self.dcMotorPWMDurationLeft * 70 / 100  # 98
+    tempPWMDurationLeft = int( self.dcMotorPWMDurationLeft * 70 / 100 )  # 98
     self.pwm.setPWM(self.dcMotorLeftMotor, 0, tempPWMDurationLeft)
 
     # Duration of the turn  
@@ -119,7 +119,7 @@ class MuleBot:
 
 
   def dcMotorRightTurn(self, duration):
-    tempPWMDurationRight = self.dcMotorPWMDurationRight * 70 / 100
+    tempPWMDurationRight = int( self.dcMotorPWMDurationRight * 70 / 100 )
     self.pwm.setPWM(self.dcMotorRightMotor, 0, tempPWMDurationRight)
 
     # Duration of the turn  
@@ -135,7 +135,7 @@ class MuleBot:
     #global dcMotorPWMDurationRight
     intSpeedRPM = int( speedRPM )
 
-#    print "motorSpeed RPM: ", speedRPM
+    print ( "motorSpeed RPM: ", speedRPM )
     if intSpeedRPM > self.motorMaxRPM:
       speedRPM = 12
 
@@ -147,6 +147,8 @@ class MuleBot:
 
     if intSpeedRPM < 0:
       speedRPM = 0
+
+    print ( "motorSpeed RPM adjusted: ", speedRPM )
 
 #   Left motor
     pwmDuration = 4096 * intSpeedRPM / self.motorMaxRPM - 1
@@ -226,6 +228,9 @@ class MuleBot:
 
           _q1.task_done()
  
+  def intFromStr( self, _string, _index ):
+      list = re.findall( r'\d+', _string )
+      return int( list[_index] )
 
   def run2(self, _q2, _qWallDistance):
         while self._running:
@@ -243,11 +248,13 @@ class MuleBot:
                 if command == 'h':
                   pass
                 elif command == 'p':
-                  count = int( filter( str.isdigit, cmd ) )
+                  index = 0
+                  count = self.intFromStr( cmd, index )
                   print ("Left Turn, ", count, " seconds")
                   self.dcMotorLeftTurn (  count  )
                 elif command == 's':
-                  count = int( filter( str.isdigit, cmd ) )
+                  index = 0
+                  count = self.intFromStr( cmd, index )
                   print ("Right Turn, ", count, " seconds")
                   self.dcMotorRightTurn( count  )
                 elif command == 't':
@@ -257,10 +264,8 @@ class MuleBot:
                   print (direction)
                   self.setMotorsDirection(direction)
 
-                  speedList = re.findall( r'\d+', cmd )
-                  print ( speedList[0] )
-                  speed = int( speedList[0] )
-
+                  index = 0
+                  speed = self.intFromStr( cmd, index )
 
                   self.motorSpeed(speed)
                 elif command == 'd':
