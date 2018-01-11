@@ -8,7 +8,7 @@ import time
 import RPi.GPIO as GPIO
 import threading
 import queue
-
+import re
 
 class MuleBot:
 
@@ -150,12 +150,14 @@ class MuleBot:
 
 #   Left motor
     pwmDuration = 4096 * intSpeedRPM / self.motorMaxRPM - 1
+    pwmDuration = int( pwmDuration )
     self.pwm.setPWM(self.dcMotorLeftMotor, 0, pwmDuration)
     self.dcMotorPWMDurationLeft = pwmDuration
 
 #   Right motor
     #Adjust for right motor being faster
     pwmDuration = pwmDuration * 9851 / 10000  # x97.019779 percent 98.519113
+    pwmDuration = int( pwmDuration )
     self.pwm.setPWM(self.dcMotorRightMotor, 0, pwmDuration)
     self.dcMotorPWMDurationRight = pwmDuration
 
@@ -255,18 +257,12 @@ class MuleBot:
                   print (direction)
                   self.setMotorsDirection(direction)
 
-            #      print cmd[1]
-                  #count = ord(cmd[1]) - ord('0')
-                  strLen = len( cmd )
-                  lastIndex = strLen - 1
-                  if (strLen == 2):
-                      print ( "split: ...", cmd[1], "..." )
-                      count = cmd[1]
-                  else:
-                      print ( "split: ...", cmd[1:lastIndex], "..." )
-                      count = cmd[1:strLen-1]
-                      #count = int( count )
-                  self.motorSpeed(count)
+                  speedList = re.findall( r'\d+', cmd )
+                  print ( speedList[0] )
+                  speed = int( speedList[0] )
+
+
+                  self.motorSpeed(speed)
                 elif command == 'd':
                   inches = int( filter( str.isdigit, cmd ) )
                   _qWallDistance.put( inches )
