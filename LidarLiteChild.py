@@ -5,7 +5,7 @@ import time
 from threading   import Thread
 from lidar_lite  import Lidar_Lite
 from collections import deque
-import Queue
+import queue
 
 
 
@@ -14,7 +14,7 @@ class LidarLiteChild(Lidar_Lite):
 
   def __init__(self):
     super( LidarLiteChild, self ).__init__()
-    print "LidarLiteChild constructor"
+    print ("LidarLiteChild constructor")
     self._running = True
     self.simulatedData = False
 
@@ -25,22 +25,22 @@ class LidarLiteChild(Lidar_Lite):
     #print "Connected = ", connected
 
     if connected >= 0:  #TODO Is this value correct???
-      print "Lidar connected"
+      print ("Lidar connected")
 
       try:
         self.writeAndWait( 0x04, 0x0A )
         self.writeAndWait( 0x11, 0x0A ) # Distance measurements per request.  Using 10.
         self.writeAndWait( 0x1C, 0x60 ) # Reduce sensitivity and errors per manual.
       except:
-        print "Lidar not available."
-        print "Using simulated data."
+        print ("Lidar not available.")
+        print ("Using simulated data.")
         self.simulatedData = True
 
       return True
 #end if
 
     else:
-      print "Lidar not connected."
+      print ("Lidar not connected.")
       return False
 
 
@@ -91,7 +91,7 @@ if __name__ == "__main__":
 
   if initOk:
 
-    qDistance = Queue.Queue(maxsize=0)
+    qDistance = queue.Queue(maxsize=0)
 
     #Create Thread
     lidarLiteChildThread = Thread(target=lidarLiteChild.run, args=(qDistance,))
@@ -101,11 +101,11 @@ if __name__ == "__main__":
 
     while True:
       distance = qDistance.get()
-      print "Distance: ", distance
+      print ("Distance: ", distance)
 
     lidarLiteChild.terminate()
-    print "Thread finished"
+    print ("Thread finished")
 
   else:
-    print "Shutting down"
+    print ("Shutting down")
 

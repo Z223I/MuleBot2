@@ -7,7 +7,7 @@ import time
 
 import RPi.GPIO as GPIO
 import threading
-import Queue
+import queue
 
 
 class MuleBot:
@@ -81,9 +81,9 @@ class MuleBot:
   def setServoPulse(channel, pulse):
     pulseLength = 1000000                   # 1,000,000 us per second
     pulseLength /= 60                       # 60 Hz
-    print "%d us per period" % pulseLength
+    print ("%d us per period" % pulseLength)
     pulseLength /= 4096                     # 12 bits of resolution
-    print "%d us per bit" % pulseLength
+    print ("%d us per bit" % pulseLength)
     pulse *= 1000
     pulse /= pulseLength
     self.pwm.setPWM(channel, 0, pulse)
@@ -96,18 +96,18 @@ class MuleBot:
 
 
   def motorsDirection(self, direction):
-    print direction
+    print (direction)
     if direction == 'r' or direction == 'R':
       self.motorDirection(self.motor1DirectionPin, self.motorReverse)
       self.motorDirection(self.motor2DirectionPin, self.motorReverse)
-      print "Direction reverse"
+      print ("Direction reverse")
     else:
       self.motorDirection(self.motor1DirectionPin, self.motorForward)
       self.motorDirection(self.motor2DirectionPin, self.motorForward)
-      print "Direction forward"
+      print ("Direction forward")
 
   def dcMotorLeftTurn(self, duration):
-    print "From dcMotorLeftTurn: ", self.dcMotorPWMDurationLeft
+    print ("From dcMotorLeftTurn: ", self.dcMotorPWMDurationLeft)
     tempPWMDurationLeft = self.dcMotorPWMDurationLeft * 70 / 100  # 98
     self.pwm.setPWM(self.dcMotorLeftMotor, 0, tempPWMDurationLeft)
 
@@ -133,9 +133,10 @@ class MuleBot:
 
     #global dcMotorPWMDurationLeft
     #global dcMotorPWMDurationRight
+    intSpeedRPM = int( speedRPM )
 
 #    print "motorSpeed RPM: ", speedRPM
-    if speedRPM > self.motorMaxRPM:
+    if intSpeedRPM > self.motorMaxRPM:
       speedRPM = 12
 
 
@@ -144,11 +145,11 @@ class MuleBot:
       #      two different variables?
 
 
-    if speedRPM < 0:
+    if intSpeedRPM < 0:
       speedRPM = 0
 
 #   Left motor
-    pwmDuration = 4096 * speedRPM / self.motorMaxRPM - 1
+    pwmDuration = 4096 * intSpeedRPM / self.motorMaxRPM - 1
     self.pwm.setPWM(self.dcMotorLeftMotor, 0, pwmDuration)
     self.dcMotorPWMDurationLeft = pwmDuration
 
@@ -202,23 +203,23 @@ class MuleBot:
 
 
           number = _q1.get();
-          print "Current distance: ", number
+          print ("Current distance: ", number)
 
           # Are we navigating?
           navigating = (self.distanceToWall > 0)
           if navigating:
-              print "Desired distance: ", self.distanceToWall
+              print ("Desired distance: ", self.distanceToWall)
 
               accuracy = 1.5
               # Navigate
               if number < self.distanceToWall - accuracy:
-                  print "Turn right >>>"
+                  print ("Turn right >>>")
                   _q2.put('s1')
               elif number > self.distanceToWall + accuracy:
-                  print "Turn left <<<"
+                  print ("Turn left <<<")
                   _q2.put('p1')
               else:
-                  print "On path."
+                  print ("On path.")
           # end if 
 
           _q1.task_done()
@@ -227,9 +228,9 @@ class MuleBot:
   def run2(self, _q2, _qWallDistance):
         while self._running:
                 name = threading.currentThread().getName()
-                print "Consumer thread 2:  ", name
+                print ("Consumer thread 2:  ", name)
                 qCommand = _q2.get();
-                print "Here is the command... ", qCommand
+                print ("Here is the command... ", qCommand)
                 print
 
 
@@ -241,29 +242,37 @@ class MuleBot:
                   pass
                 elif command == 'p':
                   count = int( filter( str.isdigit, cmd ) )
-                  print "Left Turn, ", count, " seconds"
+                  print ("Left Turn, ", count, " seconds")
                   self.dcMotorLeftTurn (  count  )
                 elif command == 's':
                   count = int( filter( str.isdigit, cmd ) )
-                  print "Right Turn, ", count, " seconds"
+                  print ("Right Turn, ", count, " seconds")
                   self.dcMotorRightTurn( count  )
                 elif command == 't':
                   self.test()
                 elif command == 'f' or command == 'r':
                   direction = command
-                  print direction
+                  print (direction)
                   self.setMotorsDirection(direction)
 
             #      print cmd[1]
                   #count = ord(cmd[1]) - ord('0')
-                  count = int( filter( str.isdigit, cmd ) )
+                  strLen = len( cmd )
+                  lastIndex = strLen - 1
+                  if (strLen == 2):
+                      print ( "split: ...", cmd[1], "..." )
+                      count = cmd[1]
+                  else:
+                      print ( "split: ...", cmd[1:lastIndex], "..." )
+                      count = cmd[1:strLen-1]
+                      #count = int( count )
                   self.motorSpeed(count)
                 elif command == 'd':
                   inches = int( filter( str.isdigit, cmd ) )
                   _qWallDistance.put( inches )
                 else:
-                  print "Invalid input: ", command
-                  print "Please try again."
+                  print ("Invalid input: ", command)
+                  print ("Please try again.")
 
 
                 #time.sleep(4)
@@ -289,7 +298,7 @@ class MuleBot:
       self.motorDirection(self.motor1DirectionPin, self.motorReverse)
       self.motorDirection(self.motor2DirectionPin, self.motorReverse)
     else:
-      print "ERROR: setMotorsDirection bad parameter: " + direction
+      print ("ERROR: setMotorsDirection bad parameter: " + direction)
 
   def shutdown(self):
     count = 0
@@ -301,7 +310,7 @@ class MuleBot:
     #GPIO.output(pwmEnablePin, GPIO.HIGH)
     GPIO.cleanup()
     print
-    print "Good Bye!"  
+    print ("Good Bye!")
 
 
 
@@ -331,7 +340,7 @@ def myInt(channel):
 
     if interruptLeftCount > 0:
       elapsedTime = now - startTimeLeft
-    print "Left ", channel, now, interruptLeftCount, elapsedTime
+    print ("Left ", channel, now, interruptLeftCount, elapsedTime)
 
 
   if channel == laserDetectRightPin:
@@ -344,7 +353,7 @@ def myInt(channel):
 
     if interruptRightCount > 0:
       elapsedTime = now - startTimeRight
-    print "Right ", channel, now, interruptRightCount, elapsedTime
+    print ("Right ", channel, now, interruptRightCount, elapsedTime)
 
 
 
@@ -370,7 +379,7 @@ def test():
         now = time.time()
         deltaTime = now - lastTime
         if deltaTime > 3.8:
-          print deltaTime
+          print (deltaTime)
           lastTime = now
           if deltaTime > 4.3:
             startTime = now
@@ -384,5 +393,5 @@ def test():
 
   totalDeltaTime = finishTime - startTime
   singleDeltaTime = totalDeltaTime / maxEvents
-  print singleDeltaTime, " * ", maxEvents, " = ", totalDeltaTime
+  print (singleDeltaTime, " * ", maxEvents, " = ", totalDeltaTime)
 

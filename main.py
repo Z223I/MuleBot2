@@ -1,5 +1,5 @@
 import threading
-import Queue
+import queue
 import time
 
 #from LL3Threaded.LidarLiteChild import LidarLiteChild
@@ -17,10 +17,10 @@ pro2 = Pro2()
 con1 = Con1()
 con2 = Con1()
 
-qNumbers      = Queue.Queue(maxsize=0)
-qCommands     = Queue.Queue(maxsize=0)
-qQuit         = Queue.Queue(maxsize=0)
-qWallDistance = Queue.Queue(maxsize=0)
+qNumbers      = queue.Queue(maxsize=0)
+qCommands     = queue.Queue(maxsize=0)
+qQuit         = queue.Queue(maxsize=0)
+qWallDistance = queue.Queue(maxsize=0)
 
 lidarLiteChildThread  = threading.Thread(target=lidarLiteChild.run, args=(qNumbers,))
 pro2Thread  = threading.Thread(target=pro2.run, args=(qCommands, qQuit, ))
@@ -36,32 +36,32 @@ qQuit.get()
 qQuit.task_done()
 
 
-print "Recieved quit command:"
+print ("Recieved quit command:")
 
 lidarLiteChild.terminate()
 pro2.terminate()
 con1.terminate()
 con2.terminate()
-print "terminated 4 threads"
+print ("terminated 4 threads")
 
-print "3"
+print ("3")
 time.sleep(1)
 
-print "2"
+print ("2")
 time.sleep(1)
 
-print "1"
+print ("1")
 time.sleep(1)
 
 
 qCommands.join()
-print "joined 1 queue(s)"
+print ("joined 1 queue(s)")
 qQuit.join()
-print "joined 2 queue(s)"
+print ("joined 2 queue(s)")
 qNumbers.join()
-print "joined 3 queue(s)"
+print ("joined 3 queue(s)")
 qWallDistance.join()
-print "joined 4 queue(s)"
+print ("joined 4 queue(s)")
 
 
-print "Bye!"
+print ("Bye!")
