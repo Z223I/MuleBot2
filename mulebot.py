@@ -181,7 +181,7 @@ class MuleBot:
 
 
 
-  def run1(self, _q1, _qWallDistance):
+  def run1(self, _q1, _q2,_qWallDistance):
       while self._running:
           #name = threading.currentThread().getName()
           #print "Consumer thread 1:  ", name
@@ -213,8 +213,10 @@ class MuleBot:
               # Navigate
               if number < self.distanceToWall - accuracy:
                   print "Turn right >>>"
+                  _q2.put('s1')
               elif number > self.distanceToWall + accuracy:
                   print "Turn left <<<"
+                  _q2.put('p1')
               else:
                   print "On path."
           # end if 
@@ -239,9 +241,11 @@ class MuleBot:
                   pass
                 elif command == 'p':
                   count = int( filter( str.isdigit, cmd ) )
+                  print "Left Turn, ", count, " seconds"
                   self.dcMotorLeftTurn (  count  )
                 elif command == 's':
                   count = int( filter( str.isdigit, cmd ) )
+                  print "Right Turn, ", count, " seconds"
                   self.dcMotorRightTurn( count  )
                 elif command == 't':
                   self.test()

@@ -24,7 +24,7 @@ qWallDistance = Queue.Queue(maxsize=0)
 
 lidarLiteChildThread  = threading.Thread(target=lidarLiteChild.run, args=(qNumbers,))
 pro2Thread  = threading.Thread(target=pro2.run, args=(qCommands, qQuit, ))
-con1Thread1 = threading.Thread(target=con1.run1, args=(qNumbers, qWallDistance))
+con1Thread1 = threading.Thread(target=con1.run1, args=(qNumbers, qCommands, qWallDistance))
 con2Thread2 = threading.Thread(target=con2.run2, args=(qCommands, qWallDistance ))
 
 lidarLiteChildThread.start()
@@ -43,6 +43,15 @@ pro2.terminate()
 con1.terminate()
 con2.terminate()
 print "terminated 4 threads"
+
+print "3"
+time.sleep(1)
+
+print "2"
+time.sleep(1)
+
+print "1"
+time.sleep(1)
 
 
 qCommands.join()

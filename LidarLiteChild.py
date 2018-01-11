@@ -78,7 +78,7 @@ class LidarLiteChild(Lidar_Lite):
  
     #print "Inches per minute: ", velocityInchesPerMinute 
 
-      time.sleep(1)
+      time.sleep(2)
 
 
 
