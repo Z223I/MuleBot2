@@ -50,7 +50,7 @@ class LidarLiteChild(Lidar_Lite):
   
   def run(self, _qDistance):
     xRange = []
-    maxItemsInQueue = 10
+    maxItemsInQueue = 1
     measurements = deque(xRange, maxItemsInQueue)
 
     while self._running:

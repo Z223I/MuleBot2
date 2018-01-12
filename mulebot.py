@@ -187,6 +187,10 @@ class MuleBot:
 
 
   def run1(self, _q1, _q2,_qWallDistance):
+
+      timeInRightTurn = 0
+      timeInLeftTurn = 0
+
       while self._running:
           #name = threading.currentThread().getName()
           #print "Consumer thread 1:  ", name
@@ -206,8 +210,8 @@ class MuleBot:
 
 
 
-          number = _q1.get();
-          print ("Current distance: ", number)
+          currentDistance = _q1.get();
+          print ("Current distance: ", currentDistance)
 
           # Are we navigating?
           navigating = (self.distanceToWall > 0)
@@ -216,17 +220,31 @@ class MuleBot:
 
               accuracy = 1.5
               # Navigate
-              if number < self.distanceToWall - accuracy:
+              if currentDistance < self.distanceToWall - accuracy:
                   print ("Turn right >>>")
+                  timeInRightTurn += 1
                   _q2.put('s1')
-              elif number > self.distanceToWall + accuracy:
+              elif currentDistance > self.distanceToWall + accuracy:
                   print ("Turn left <<<")
+                  timeInLeftTurn += 1
                   _q2.put('p1')
               else:
+                  if ( timeInRightTurn > 0 ):
+                      for i in range( timeInRightTurn ):
+                          _q2.put('p1')
+                      # Reset the time
+                      timeInRightTurn = 0
+                  if ( timeInLeftTurn > 0 ):
+                      for i in range( timeInLeftTurn ):
+                          _q2.put('s1')
+                      # Reset the time
+                      timeInLeftTurn = 0
                   print ("On path.")
           # end if 
 
           _q1.task_done()
+
+
  
   def intFromStr( self, _string, _index ):
       list = re.findall( r'\d+', _string )
@@ -269,7 +287,8 @@ class MuleBot:
 
                   self.motorSpeed(speed)
                 elif command == 'd':
-                  inches = int( filter( str.isdigit, cmd ) )
+                  index = 0
+                  inches = self.intFromStr( cmd, index )
                   _qWallDistance.put( inches )
                 else:
                   print ("Invalid input: ", command)
