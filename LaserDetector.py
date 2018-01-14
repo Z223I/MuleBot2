@@ -24,11 +24,11 @@ class MuleBot:
 
     # This is interupts setups.  They get used with the
     # myInt() method.
-    GPIO.setup(laserDetectLeftPin,  GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(laserDetectRightPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(self.laserDetectLeftPin,  GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(self.laserDetectRightPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-    GPIO.add_event_detect(laserDetectLeftPin,  GPIO.FALLING, callback=myInt)
-    GPIO.add_event_detect(laserDetectRightPin, GPIO.FALLING, callback=myInt)
+    GPIO.add_event_detect(self.laserDetectLeftPin,  GPIO.FALLING, callback=myInt)
+    GPIO.add_event_detect(self.laserDetectRightPin, GPIO.FALLING, callback=myInt)
 
 
 
@@ -60,6 +60,9 @@ class MuleBot:
 
 
 def myInt(channel):
+
+  laserDetectLeftPin  = 6
+  laserDetectRightPin = 5
 
   if channel == laserDetectLeftPin:
     print "Detected LEFT laser."
