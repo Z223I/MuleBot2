@@ -4,9 +4,9 @@ import RPi.GPIO as GPIO
 
 
 laserDetectFarLeftPin  =  6
-laserDetectLeftPin     = 13
+laserDetectLeftPin     = 19
 laserDetectCenterPin   = 21
-laserDetectRightPin    = 19
+laserDetectRightPin    = 13
 laserDetectFarRightPin = 26
 
 
@@ -50,7 +50,8 @@ class LaserDetector:
 
 def write(_string):
     with open("log.txt", "a") as log:
-        log.write( _string )
+        log.write( "{0}\n".format( _string ) )
+    log.close()
 
 
 def myInt(channel):
@@ -79,7 +80,7 @@ def myInt(channel):
 
   if channel == laserDetectFarRightPin:
     print "Detected FAR RIGHT laser."
-    write(  )
+    write( "detected bar right laser."  )
 
 
 
@@ -156,3 +157,6 @@ mb.shutdown()
 # exception keyboard
 # cleanup pwm
 #pwm.cleanup()
+
+
+
