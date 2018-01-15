@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import RPi.GPIO as GPIO
+import os
 
 
 laserDetectFarLeftPin  =  6
@@ -65,6 +66,7 @@ def myInt(channel):
   if channel == laserDetectFarLeftPin:
     print "Detected FAR LEFT laser."
     write("Detected FAR LEFT laser.")
+    os.system( "/home/pi/pythondev/MuleBot2/FarLeft.sh" )
 
   if channel == laserDetectLeftPin:
     print "Detected LEFT laser."
@@ -130,6 +132,7 @@ def test():
 
 mb = LaserDetector()
 
+myInt(6)
 
 doContinue = True
 
