@@ -67,6 +67,7 @@ def myInt(channel):
     print "Detected FAR LEFT laser."
     write("Detected FAR LEFT laser.")
     os.system( "/home/pi/pythondev/MuleBot2/FarLeft.sh" )
+    os.system( "ssh pi@rpi-one \'/home/pi/pythondev/MuleBot2/FarLeft.sh\'" )
 
   if channel == laserDetectLeftPin:
     print "Detected LEFT laser."
