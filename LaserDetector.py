@@ -3,42 +3,41 @@
 import RPi.GPIO as GPIO
 
 
+laserDetectFarLeftPin  =  6
+laserDetectLeftPin     = 13
+laserDetectCenterPin   = 21
+laserDetectRightPin    = 19
+laserDetectFarRightPin = 26
 
-class MuleBot:
+
+class LaserDetector:
+
+  global laserDetectFarLeftPin
+  global laserDetectLeftPin
+  global laserDetectCenterPin
+  global laserDetectRightPin
+  global laserDetectFarRightPin
+
   def __init__(self):
 
     global GPIO
-
-
-
-
-    self.laserDetectLeftPin  = 6
-    self.laserDetectRightPin = 5
-
-
-
-
 
     # Pin Setup:
     GPIO.setmode(GPIO.BCM) # Broadcom pin-numbering scheme
 
     # This is interupts setups.  They get used with the
     # myInt() method.
-    GPIO.setup(self.laserDetectLeftPin,  GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(self.laserDetectRightPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(laserDetectFarLeftPin,  GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(laserDetectLeftPin,     GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(laserDetectCenterPin,   GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(laserDetectRightPin,    GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(laserDetectFarRightPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-    GPIO.add_event_detect(self.laserDetectLeftPin,  GPIO.FALLING, callback=myInt)
-    GPIO.add_event_detect(self.laserDetectRightPin, GPIO.FALLING, callback=myInt)
-
-
-
-
-
-
-
-
-
-
+    GPIO.add_event_detect(laserDetectFarLeftPin,  GPIO.FALLING, callback=myInt)
+    GPIO.add_event_detect(laserDetectLeftPin,     GPIO.FALLING, callback=myInt)
+    GPIO.add_event_detect(laserDetectCenterPin,   GPIO.FALLING, callback=myInt)
+    GPIO.add_event_detect(laserDetectRightPin,    GPIO.FALLING, callback=myInt)
+    GPIO.add_event_detect(laserDetectFarRightPin, GPIO.FALLING, callback=myInt)
 
 
   def shutdown(self):
@@ -49,27 +48,38 @@ class MuleBot:
 
 
 
-
-
-
-
-
-
-
-
+def write(_string):
+    with open("log.txt", "a") as log:
+        log.write( _string )
 
 
 def myInt(channel):
 
-  laserDetectLeftPin  = 6
-  laserDetectRightPin = 5
+  global laserDetectFarLeftPin
+  global laserDetectLeftPin
+  global laserDetectCenterPin
+  global laserDetectRightPin
+  global laserDetectFarRightPin
+
+  if channel == laserDetectFarLeftPin:
+    print "Detected FAR LEFT laser."
+    write("Detected FAR LEFT laser.")
 
   if channel == laserDetectLeftPin:
     print "Detected LEFT laser."
+    write("Detected LEFT laser.")
 
+  if channel == laserDetectCenterPin:
+    print "Detected CENTER laser."
+    write("Detected CENTER laser.")
 
   if channel == laserDetectRightPin:
     print "Detected RIGHT laser."
+    write("Detected RIGHT laser.")
+
+  if channel == laserDetectFarRightPin:
+    print "Detected FAR RIGHT laser."
+    write(  )
 
 
 
@@ -117,7 +127,7 @@ def test():
 
 
 
-mb = MuleBot()
+mb = LaserDetector()
 
 
 doContinue = True
@@ -125,7 +135,7 @@ doContinue = True
 try:
   while (doContinue):
 
-    cmd = raw_input(":;<  Command, f/r 0..9, E.g. f5: ")
+    cmd = raw_input("Command, [h, t]: ")
     command = cmd[0]
 
     if command == 'h':
