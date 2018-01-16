@@ -188,6 +188,16 @@ class MuleBot:
 
   def run1(self, _q1, _q2,_qWallDistance):
 
+      """This method, run1, is used to navigate the MuleBot to
+       a desired distance from the wall.
+
+       _q1 is the current distance to the wall.
+       _qWallDistance is used occasionally to establish
+       the desire distance.
+
+       _q2 is used to send steering directions to the run2 thread."""
+
+
       timeInRightTurn = 0
       timeInLeftTurn = 0
 
@@ -213,12 +223,16 @@ class MuleBot:
           currentDistance = _q1.get();
           print ("Current distance: ", currentDistance)
 
+          qSize = _q1.qsize()
+          if qSize > 1:
+            print ( "***** Distance Queue Size: ", qSize, " *****" )
+
           # Are we navigating?
           navigating = (self.distanceToWall > 0)
           if navigating:
               print ("Desired distance: ", self.distanceToWall)
 
-              accuracy = 1.5
+              accuracy = 0.5
               # Navigate
               if currentDistance < self.distanceToWall - accuracy:
                   print ("Turn right >>>")
@@ -257,6 +271,12 @@ class MuleBot:
                 qCommand = _q2.get();
                 print ("Here is the command... ", qCommand)
                 print
+
+
+                qSize = _q2.qsize()
+                if qSize > 1:
+                  print ( "***** Command Queue Size: ", qSize, " *****" )
+
 
 
                 # Change speed of motors
