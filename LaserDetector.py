@@ -65,7 +65,7 @@ class LaserDetector:
       shellCommand = "ssh pi@rpi-one \'/home/pi/pythondev/MuleBot2/"
       shellCommand += message
       shellCommand += ".sh\'"
-#      os.system( shellCommand )
+      os.system( shellCommand )
 
   def myInt(self, channel):
 
