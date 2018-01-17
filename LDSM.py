@@ -43,7 +43,7 @@ class LDSM():
             ['LeftLaser',     'LO_C',  'LO_L'],
             ['FarLeftLaser',  'LO_L',  'LO_FL']
         ]
-        self.m = Machine(states=self.states, transitions=self.transitions, initial='LO_C')
+        self.m = Machine(states=self.states, transitions=self.transitions, initial='LO_FL')
 
 
     def test(self):

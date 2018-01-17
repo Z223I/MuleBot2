@@ -143,16 +143,14 @@ def test():
 
 ld = LaserDetector()
 
-#ld.myInt(6)
+#ld.myInt(21)
+#ld.myInt(13)
+#ld.myInt(26)
+#ld.myInt(26)
+#ld.myInt(13)
+#ld.myInt(21)
 #ld.myInt(19)
-ld.myInt(21)
-ld.myInt(13)
-ld.myInt(26)
-ld.myInt(26)
-ld.myInt(13)
-ld.myInt(21)
-ld.myInt(19)
-ld.myInt(6)
+#ld.myInt(6)
 
 doContinue = True
 
