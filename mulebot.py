@@ -333,11 +333,19 @@ class MuleBot:
 
 
   def laserNav( self ):
+      os.system( "rm *.loc" )
 
       while self._running:
           files = os.listdir("/home/pi/pythondev/MuleBot2/")
-          print ( files )
-          time.sleep(5)
+          
+          for file in files:
+              # Looking for files ending in ".loc"
+              if file.endswith(".loc"):
+                  print ( file )
+                  command = "rm " + file
+                  os.system( command )
+
+          time.sleep(1)
 
 
 
