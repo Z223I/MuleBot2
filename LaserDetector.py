@@ -54,6 +54,13 @@ def write(_string):
         log.write( "{0}\n".format( _string ) )
     log.close()
 
+def record( message ):
+    print( message )
+#    write( message )
+    shellCommand = "ssh pi@rpi-one \'/home/pi/pythondev/MuleBot2/"
+    shellCommand += message
+    shellCommand += ".sh\'"
+    os.system( shellCommand )
 
 def myInt(channel):
 
@@ -64,26 +71,19 @@ def myInt(channel):
   global laserDetectFarRightPin
 
   if channel == laserDetectFarLeftPin:
-    print "Detected FAR LEFT laser."
-    write("Detected FAR LEFT laser.")
-    #os.system( "/home/pi/pythondev/MuleBot2/FarLeft.sh" )
-    os.system( "ssh pi@rpi-one \'/home/pi/pythondev/MuleBot2/FarLeft.sh\'" )
+    record( "FarLeft" )
 
   if channel == laserDetectLeftPin:
-    print "Detected LEFT laser."
-    write("Detected LEFT laser.")
+    record( "Left" )
 
   if channel == laserDetectCenterPin:
-    print "Detected CENTER laser."
-    write("Detected CENTER laser.")
+    record( "Center" )
 
   if channel == laserDetectRightPin:
-    print "Detected RIGHT laser."
-    write("Detected RIGHT laser.")
+    record( "Right" )
 
   if channel == laserDetectFarRightPin:
-    print "Detected FAR RIGHT laser."
-    write( "detected bar right laser."  )
+    record( "FarRight" )
 
 
 
@@ -133,7 +133,11 @@ def test():
 
 mb = LaserDetector()
 
-myInt(6)
+#myInt(6)
+#myInt(19)
+#myInt(21)
+#myInt(13)
+#myInt(26)
 
 doContinue = True
 
