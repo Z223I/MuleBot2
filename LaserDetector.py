@@ -131,13 +131,13 @@ def test():
 
 
 
-mb = LaserDetector()
+ld = LaserDetector()
 
-#mb.myInt(6)
-#mb.myInt(19)
-#mb.myInt(21)
-#mb.myInt(13)
-#mb.myInt(26)
+#ld.myInt(6)
+#ld.myInt(19)
+#ld.myInt(21)
+#ld.myInt(13)
+#ld.myInt(26)
 
 doContinue = True
 
@@ -161,7 +161,7 @@ except KeyboardInterrupt:
 
 
 
-mb.shutdown()
+ld.shutdown()
 # exception keyboard
 # cleanup pwm
 #pwm.cleanup()
