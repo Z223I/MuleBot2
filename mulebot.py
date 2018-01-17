@@ -227,7 +227,7 @@ class MuleBot:
 
 
           currentDistance = _q1.get();
-          print ("Current distance: ", currentDistance)
+#          print ("Current distance: ", currentDistance)
 
           qSize = _q1.qsize()
           if qSize > 1:

@@ -75,7 +75,7 @@ class LidarLiteChild(Lidar_Lite):
         _qDistance.put(average)
       else:
         _qDistance.put( distanceInch )
-        print ( "Laser detector distance: ", distanceInch )
+#        print ( "Laser detector distance: ", distanceInch )
 
 
 #    velocityMetersPerSecond = lidar.getVelocity()
