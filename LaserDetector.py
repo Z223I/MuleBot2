@@ -3,6 +3,8 @@
 import RPi.GPIO as GPIO
 import os
 
+from LDSM import LDSM
+
 
 laserDetectFarLeftPin  =  6
 laserDetectLeftPin     = 19
@@ -34,11 +36,14 @@ class LaserDetector:
     GPIO.setup(laserDetectRightPin,    GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(laserDetectFarRightPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-    GPIO.add_event_detect(laserDetectFarLeftPin,  GPIO.FALLING, callback=myInt)
-    GPIO.add_event_detect(laserDetectLeftPin,     GPIO.FALLING, callback=myInt)
-    GPIO.add_event_detect(laserDetectCenterPin,   GPIO.FALLING, callback=myInt)
-    GPIO.add_event_detect(laserDetectRightPin,    GPIO.FALLING, callback=myInt)
-    GPIO.add_event_detect(laserDetectFarRightPin, GPIO.FALLING, callback=myInt)
+    GPIO.add_event_detect(laserDetectFarLeftPin,  GPIO.FALLING, callback=self.myInt)
+    GPIO.add_event_detect(laserDetectLeftPin,     GPIO.FALLING, callback=self.myInt)
+    GPIO.add_event_detect(laserDetectCenterPin,   GPIO.FALLING, callback=self.myInt)
+    GPIO.add_event_detect(laserDetectRightPin,    GPIO.FALLING, callback=self.myInt)
+    GPIO.add_event_detect(laserDetectFarRightPin, GPIO.FALLING, callback=self.myInt)
+
+    # Establish LaserDetectorStateModel
+    self.ldsm = LDSM()
 
 
   def shutdown(self):
@@ -49,41 +54,43 @@ class LaserDetector:
 
 
 
-def write(_string):
-    with open("log.txt", "a") as log:
-        log.write( "{0}\n".format( _string ) )
-    log.close()
+  def write(self, _string):
+      with open("log.txt", "a") as log:
+          log.write( "{0}\n".format( _string ) )
+      log.close()
 
-def record( message ):
-    print( message )
-#    write( message )
-    shellCommand = "ssh pi@rpi-one \'/home/pi/pythondev/MuleBot2/"
-    shellCommand += message
-    shellCommand += ".sh\'"
-    os.system( shellCommand )
+  def record( self, message ):
+      print( message )
+  #    write( message )
+      shellCommand = "ssh pi@rpi-one \'/home/pi/pythondev/MuleBot2/"
+      shellCommand += message
+      shellCommand += ".sh\'"
+      os.system( shellCommand )
 
-def myInt(channel):
+  def myInt(self, channel):
 
-  global laserDetectFarLeftPin
-  global laserDetectLeftPin
-  global laserDetectCenterPin
-  global laserDetectRightPin
-  global laserDetectFarRightPin
+#    global laserDetectFarLeftPin
+#    global laserDetectLeftPin
+#    global laserDetectCenterPin
+#    global laserDetectRightPin
+#    global laserDetectFarRightPin
 
-  if channel == laserDetectFarLeftPin:
-    record( "FarLeft" )
+    if channel == laserDetectFarLeftPin:
+      self.record( "FarLeft" )
 
-  if channel == laserDetectLeftPin:
-    record( "Left" )
+    if channel == laserDetectLeftPin:
+      self.record( "Left" )
 
-  if channel == laserDetectCenterPin:
-    record( "Center" )
+    if channel == laserDetectCenterPin:
+      self.record( "Center" )
+      self.ldsm.m.Center
+      print "State: ", self.ldsm.m.state
 
-  if channel == laserDetectRightPin:
-    record( "Right" )
+    if channel == laserDetectRightPin:
+      self.record( "Right" )
 
-  if channel == laserDetectFarRightPin:
-    record( "FarRight" )
+    if channel == laserDetectFarRightPin:
+      self.record( "FarRight" )
 
 
 
@@ -131,13 +138,13 @@ def test():
 
 
 
-mb = LaserDetector()
+ld = LaserDetector()
 
-#myInt(6)
-#myInt(19)
-#myInt(21)
-#myInt(13)
-#myInt(26)
+#ld.myInt(6)
+#ld.myInt(19)
+ld.myInt(21)
+#ld.myInt(13)
+#ld.myInt(26)
 
 doContinue = True
 
@@ -161,7 +168,7 @@ except KeyboardInterrupt:
 
 
 
-mb.shutdown()
+ld.shutdown()
 # exception keyboard
 # cleanup pwm
 #pwm.cleanup()
