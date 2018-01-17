@@ -65,7 +65,7 @@ class LaserDetector:
       shellCommand = "ssh pi@rpi-one \'/home/pi/pythondev/MuleBot2/"
       shellCommand += message
       shellCommand += ".sh\'"
-      os.system( shellCommand )
+#      os.system( shellCommand )
 
   def myInt(self, channel):
 
@@ -76,21 +76,24 @@ class LaserDetector:
 #    global laserDetectFarRightPin
 
     if channel == laserDetectFarLeftPin:
-      self.record( "FarLeft" )
+      self.ldsm.m.FarLeftLaser()
+      self.record( self.ldsm.m.state )
 
     if channel == laserDetectLeftPin:
-      self.record( "Left" )
+      self.ldsm.m.LeftLaser()
+      self.record( self.ldsm.m.state )
 
     if channel == laserDetectCenterPin:
-      self.record( "Center" )
       self.ldsm.m.CenterLaser()
-      print "State: ", self.ldsm.m.state
+      self.record( self.ldsm.m.state )
 
     if channel == laserDetectRightPin:
-      self.record( "Right" )
+      self.ldsm.m.RightLaser()
+      self.record( self.ldsm.m.state )
 
     if channel == laserDetectFarRightPin:
-      self.record( "FarRight" )
+      self.ldsm.m.FarRightLaser()
+      self.record( self.ldsm.m.state )
 
 
 
@@ -143,8 +146,13 @@ ld = LaserDetector()
 #ld.myInt(6)
 #ld.myInt(19)
 ld.myInt(21)
-#ld.myInt(13)
-#ld.myInt(26)
+ld.myInt(13)
+ld.myInt(26)
+ld.myInt(26)
+ld.myInt(13)
+ld.myInt(21)
+ld.myInt(19)
+ld.myInt(6)
 
 doContinue = True
 
