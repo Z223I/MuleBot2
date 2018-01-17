@@ -9,6 +9,8 @@ import RPi.GPIO as GPIO
 import threading
 import queue
 import re
+import os
+
 
 class MuleBot:
 
@@ -21,6 +23,10 @@ class MuleBot:
 
     # Keep MuleBot parallel to the wall at this distance.
     self.distanceToWall = 0
+
+    # Remove old navigation files.
+    os.system( "rm *.nav" )
+
 
     self.pwmEnablePin       = 16 # Broadcom pin 16
     self.motor1DirectionPin = 20 # Broadcom pin 20

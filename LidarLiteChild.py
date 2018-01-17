@@ -64,12 +64,18 @@ class LidarLiteChild(Lidar_Lite):
 
 #      print "Inches:  ", distanceInch
 
-      measurements.appendleft( distanceInch )
-      sumOfMeasurements = sum( measurements )
-      average = sumOfMeasurements / len( measurements )
+      # Currently the averaging block of code isn't being used.
+      averaging = False
 
-      #print 'Running average Inches: {:.2f}'.format(average)
-      _qDistance.put(average)
+      if averaging:
+        measurements.appendleft( distanceInch )
+        sumOfMeasurements = sum( measurements )
+        average = sumOfMeasurements / len( measurements )
+        #print 'Running average Inches: {:.2f}'.format(average)
+        _qDistance.put(average)
+      else:
+        _qDistance.put( distanceInch )
+        print ( "Laser detector distance: ", distanceInch )
 
 
 #    velocityMetersPerSecond = lidar.getVelocity()
@@ -78,7 +84,7 @@ class LidarLiteChild(Lidar_Lite):
  
     #print "Inches per minute: ", velocityInchesPerMinute 
 
-      time.sleep(2)
+      time.sleep(2.5)
 
 
 
