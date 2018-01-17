@@ -34,11 +34,11 @@ class LaserDetector:
     GPIO.setup(laserDetectRightPin,    GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(laserDetectFarRightPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-    GPIO.add_event_detect(laserDetectFarLeftPin,  GPIO.FALLING, callback=myInt)
-    GPIO.add_event_detect(laserDetectLeftPin,     GPIO.FALLING, callback=myInt)
-    GPIO.add_event_detect(laserDetectCenterPin,   GPIO.FALLING, callback=myInt)
-    GPIO.add_event_detect(laserDetectRightPin,    GPIO.FALLING, callback=myInt)
-    GPIO.add_event_detect(laserDetectFarRightPin, GPIO.FALLING, callback=myInt)
+    GPIO.add_event_detect(laserDetectFarLeftPin,  GPIO.FALLING, callback=self.myInt)
+    GPIO.add_event_detect(laserDetectLeftPin,     GPIO.FALLING, callback=self.myInt)
+    GPIO.add_event_detect(laserDetectCenterPin,   GPIO.FALLING, callback=self.myInt)
+    GPIO.add_event_detect(laserDetectRightPin,    GPIO.FALLING, callback=self.myInt)
+    GPIO.add_event_detect(laserDetectFarRightPin, GPIO.FALLING, callback=self.myInt)
 
 
   def shutdown(self):
@@ -49,41 +49,41 @@ class LaserDetector:
 
 
 
-def write(_string):
-    with open("log.txt", "a") as log:
-        log.write( "{0}\n".format( _string ) )
-    log.close()
+  def write(self, _string):
+      with open("log.txt", "a") as log:
+          log.write( "{0}\n".format( _string ) )
+      log.close()
 
-def record( message ):
-    print( message )
-#    write( message )
-    shellCommand = "ssh pi@rpi-one \'/home/pi/pythondev/MuleBot2/"
-    shellCommand += message
-    shellCommand += ".sh\'"
-    os.system( shellCommand )
+  def record( self, message ):
+      print( message )
+  #    write( message )
+      shellCommand = "ssh pi@rpi-one \'/home/pi/pythondev/MuleBot2/"
+      shellCommand += message
+      shellCommand += ".sh\'"
+      os.system( shellCommand )
 
-def myInt(channel):
+  def myInt(self, channel):
 
-  global laserDetectFarLeftPin
-  global laserDetectLeftPin
-  global laserDetectCenterPin
-  global laserDetectRightPin
-  global laserDetectFarRightPin
+#    global laserDetectFarLeftPin
+#    global laserDetectLeftPin
+#    global laserDetectCenterPin
+#    global laserDetectRightPin
+#    global laserDetectFarRightPin
 
-  if channel == laserDetectFarLeftPin:
-    record( "FarLeft" )
+    if channel == laserDetectFarLeftPin:
+      self.record( "FarLeft" )
 
-  if channel == laserDetectLeftPin:
-    record( "Left" )
+    if channel == laserDetectLeftPin:
+      self.record( "Left" )
 
-  if channel == laserDetectCenterPin:
-    record( "Center" )
+    if channel == laserDetectCenterPin:
+      self.record( "Center" )
 
-  if channel == laserDetectRightPin:
-    record( "Right" )
+    if channel == laserDetectRightPin:
+      self.record( "Right" )
 
-  if channel == laserDetectFarRightPin:
-    record( "FarRight" )
+    if channel == laserDetectFarRightPin:
+      self.record( "FarRight" )
 
 
 
@@ -133,11 +133,11 @@ def test():
 
 mb = LaserDetector()
 
-#myInt(6)
-#myInt(19)
-#myInt(21)
-#myInt(13)
-#myInt(26)
+#mb.myInt(6)
+#mb.myInt(19)
+#mb.myInt(21)
+#mb.myInt(13)
+#mb.myInt(26)
 
 doContinue = True
 
