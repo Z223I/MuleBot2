@@ -83,7 +83,7 @@ class LaserDetector:
 
     if channel == laserDetectCenterPin:
       self.record( "Center" )
-      self.ldsm.m.Center
+      self.ldsm.m.CenterLaser()
       print "State: ", self.ldsm.m.state
 
     if channel == laserDetectRightPin:
