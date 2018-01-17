@@ -332,7 +332,12 @@ class MuleBot:
 
 
 
+  def laserNav( self ):
 
+      while self._running:
+          files = os.listdir("/home/pi/pythondev/MuleBot2/")
+          print ( files )
+          time.sleep(5)
 
 
 
