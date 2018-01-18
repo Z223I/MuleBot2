@@ -25,9 +25,9 @@ qWallDistance = queue.Queue(maxsize=0)
 
 lidarLiteChildThread  = threading.Thread(target=lidarLiteChild.run, args=(qNumbers,))
 pro2Thread  = threading.Thread(target=pro2.run, args=(qCommands, qQuit, ))
-con1Thread1 = threading.Thread(target=con1.run1, args=(qNumbers, qCommands, qWallDistance))
-con2Thread2 = threading.Thread(target=con2.run2, args=(qCommands, qWallDistance ))
-stateLocationThread = threading.Thread(target=stateLocation.laserNav)
+con1Thread1 = threading.Thread(target=con1.run1, args=(qNumbers, qCommands, qWallDistance, ))
+con2Thread2 = threading.Thread(target=con2.run2, args=(qCommands, qWallDistance, ))
+stateLocationThread = threading.Thread(target=stateLocation.laserNav, args=(qCommands, ))
 
 lidarLiteChildThread.start()
 pro2Thread.start()

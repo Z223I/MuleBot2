@@ -24,9 +24,6 @@ class MuleBot:
     # Keep MuleBot parallel to the wall at this distance.
     self.distanceToWall = 0
 
-    # Remove old navigation files.
-    os.system( "rm *.nav" )
-
 
     self.pwmEnablePin       = 16 # Broadcom pin 16
     self.motor1DirectionPin = 20 # Broadcom pin 20
@@ -184,18 +181,12 @@ class MuleBot:
 
 
 
-  def run(self):
-
-    # Begin main code
-    self.dcMotorPWMDurationLeft = 0
-    self.dcMotorPWMDurationRight = 0
-
-
-
   def run1(self, _q1, _q2,_qWallDistance):
 
       """This method, run1, is used to navigate the MuleBot to
        a desired distance from the wall.
+
+       This method is a thread.
 
        _q1 is the current distance to the wall.
        _qWallDistance is used occasionally to establish
@@ -270,6 +261,8 @@ class MuleBot:
       list = re.findall( r'\d+', _string )
       return int( list[_index] )
 
+  """ run2 is a thread """
+
   def run2(self, _q2, _qWallDistance):
         while self._running:
                 name = threading.currentThread().getName()
@@ -286,6 +279,7 @@ class MuleBot:
 
 
                 # Change speed of motors
+                qCommand = qCommand.lower()
                 cmd = qCommand
                 command = cmd[0]
 
@@ -330,10 +324,30 @@ class MuleBot:
         self.shutdown()
 
 
+  """ Name:  laserNav
+      Date:  January 2018
 
+      Arguments:  self
 
-  def laserNav( self ):
-      os.system( "rm *.loc" )
+      Purpose:  laserNav monitors the Laser Detector' state.
+                The Laser Detector's computer executes a shell 
+                script on the MuleBot's computer to establish a
+                file whos name indicates the current state.
+
+                Each file has the name format of '*.loc'.
+
+                The state of the Laser Detector changes so slowly,
+                that using files is probably fast enough.
+  """
+                
+
+  def laserNav( self, _qCommands ):
+      try:
+          # At start of the thread, delete all loc[ation] files.
+          os.system( "rm *.loc" )
+      except:
+          pass
+
 
       while self._running:
           files = os.listdir("/home/pi/pythondev/MuleBot2/")
@@ -345,7 +359,25 @@ class MuleBot:
                   command = "rm " + file
                   os.system( command )
 
-          time.sleep(1)
+                  # Determine which of the six states that the
+                  # Laser Detector is in.
+                  if file == "LO_FL.loc":
+                      _qCommands.put("S6")
+                  elif file == "LO_L.loc":
+                      _qCommands.put("S3")
+                      pass
+                  elif file == "LO_C.loc":
+                      pass
+                  elif file == "RO_C.loc":
+                      pass
+                  elif file == "RO_R.loc":
+                      _qCommands.put("P3")
+                  elif file == "RO_FR.loc":
+                      _qCommands.put("P6")
+                  else:
+                      print( file, " is an invalid state name" )
+
+          time.sleep(0.5)
 
 
 
