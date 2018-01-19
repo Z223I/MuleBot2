@@ -379,31 +379,32 @@ class MuleBot:
                   os.system( command )
 
                   # Determine which of the six states that the
-                  # Laser Detector is in.
+                  # Laser Detector is in and steer accordingly.
                   if file == "LO_FL.loc":
                       _qCommands.put("S6")
                       lastCommand = "S6"
-                      lastCommandChangeTime = time.time()
                   elif file == "LO_L.loc":
                       _qCommands.put("S3")
                       lastCommand = "S3"
-                      lastCommandChangeTime = time.time()
                   elif file == "LO_C.loc":
-                      lastCommand = None
-                      lastCommandChangeTime = time.time()
+                      _qCommands.put("S1")
+                      lastCommand = "S1"
                   elif file == "RO_C.loc":
-                      lastCommand = None
-                      lastCommandChangeTime = time.time()
+                      _qCommands.put("P1")
+                      lastCommand = "P1"
                   elif file == "RO_R.loc":
                       _qCommands.put("P3")
                       lastCommand = "P3"
-                      lastCommandChangeTime = time.time()
                   elif file == "RO_FR.loc":
                       _qCommands.put("P6")
                       lastCommand = "P6"
-                      lastCommandChangeTime = time.time()
                   else:
+                      # This should never happen.
                       print( file, " is an invalid state name" )
+
+                  # Ignoring the check for an invalid state, their
+                  # there should have been a command issued.
+                  lastCommandChangeTime = time.time()
 
           time.sleep(0.5)
 
