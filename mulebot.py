@@ -216,7 +216,66 @@ class MuleBot:
 
 
           currentDistance = _q1.get();
-#          print ("Current distance: ", currentDistance)
+          print ("Current distance: ", currentDistance)
+
+          qSize = _q1.qsize()
+          if qSize > 1:
+            print ( "***** Distance Queue Size: ", qSize, " *****" )
+
+          # Are we navigating?
+          navigating = (self.distanceToWall > 0)
+          if navigating:
+              print ("Desired distance: ", self.distanceToWall)
+
+              accuracy = 0.5
+              # Navigate
+              if currentDistance < self.distanceToWall - accuracy:
+                  print ("Turn right >>>")
+                  timeInRightTurn += 1
+                  _q2.put('s1')
+              elif currentDistance > self.distanceToWall + accuracy:
+                  print ("Turn left <<<")
+                  timeInLeftTurn += 1
+                  _q2.put('p1')
+              else:
+                  if ( timeInRightTurn > 0 ):
+                      for i in range( timeInRightTurn ):
+                          _q2.put('p1')
+                      # Reset the time
+                      timeInRightTurn = 0
+                  if ( timeInLeftTurn > 0 ):
+                      for i in range( timeInLeftTurn ):
+                          _q2.put('s1')
+                      # Reset the time
+                      timeInLeftTurn = 0
+                  print ("On path.")
+          # end if 
+
+          _q1.task_done()
+
+
+  def lidarNav(self, _q1, _q2):
+
+      """This method, run1, is used to navigate the MuleBot to
+       a desired distance from the wall.
+
+       This method is a thread.
+
+       _q1 is the current distance to the wall.
+
+       _q2 is used to send steering directions to the run2 thread."""
+
+
+      timeInRightTurn = 0
+      timeInLeftTurn = 0
+
+      while self._running:
+          #name = threading.currentThread().getName()
+          #print "Consumer thread 1:  ", name
+
+
+          currentDistance = _q1.get();
+          print ("Current distance: ", currentDistance)
 
           qSize = _q1.qsize()
           if qSize > 1:
