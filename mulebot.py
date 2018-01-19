@@ -2,8 +2,6 @@
 
 from Adafruit_PWM_Servo_Driver import PWM
 import time
-#import datetime
-#channel = 6
 
 import RPi.GPIO as GPIO
 import threading
@@ -324,32 +322,53 @@ class MuleBot:
         self.shutdown()
 
 
-  """ Name:  laserNav
-      Date:  January 2018
-
-      Arguments:  self
-
-      Purpose:  laserNav monitors the Laser Detector' state.
-                The Laser Detector's computer executes a shell 
-                script on the MuleBot's computer to establish a
-                file whos name indicates the current state.
-
-                Each file has the name format of '*.loc'.
-
-                The state of the Laser Detector changes so slowly,
-                that using files is probably fast enough.
-  """
                 
 
   def laserNav( self, _qCommands ):
+
+      """ Name:  laserNav
+          Date:  January 2018
+
+          Arguments:  self
+
+          Purpose:  laserNav monitors the Laser Detector' state.
+                    The Laser Detector's computer executes a shell 
+                    script on the MuleBot's computer to establish a
+                    file whos name indicates the current state.
+
+                    Each file has the name format of '*.loc'.
+
+                    The state of the Laser Detector changes so slowly,
+                    that using files is probably fast enough.
+      """
+
       try:
+          # TODO:  I don't think this is catching the file not found error.
           # At start of the thread, delete all loc[ation] files.
           os.system( "rm *.loc" )
       except:
           pass
 
+      lastCommandChangeTime = None
+      lastCommand = None
 
       while self._running:
+
+          if not (lastCommandChangeTime == None):
+              if not (lastCommand == None):
+                  # There is a time and command.
+              
+                  # Check if at least 30 seconds have passed since 
+                  # last state change.
+                  TIME_TO_WAIT = 30   # Seconds
+                  currentTime = time.time() # Seconds
+                  sufficientWaitTime = ( (currentTime - lastCommandChangeTime) > TIME_TO_WAIT )
+                  if sufficientWaitTime:
+                      _qCommands.put(lastCommand)
+                      lastCommandChangeTime = currentTime
+
+
+
           files = os.listdir("/home/pi/pythondev/MuleBot2/")
           
           for file in files:
@@ -363,17 +382,26 @@ class MuleBot:
                   # Laser Detector is in.
                   if file == "LO_FL.loc":
                       _qCommands.put("S6")
+                      lastCommand = "S6"
+                      lastCommandChangeTime = time.time()
                   elif file == "LO_L.loc":
                       _qCommands.put("S3")
-                      pass
+                      lastCommand = "S3"
+                      lastCommandChangeTime = time.time()
                   elif file == "LO_C.loc":
-                      pass
+                      lastCommand = None
+                      lastCommandChangeTime = time.time()
                   elif file == "RO_C.loc":
-                      pass
+                      lastCommand = None
+                      lastCommandChangeTime = time.time()
                   elif file == "RO_R.loc":
                       _qCommands.put("P3")
+                      lastCommand = "P3"
+                      lastCommandChangeTime = time.time()
                   elif file == "RO_FR.loc":
                       _qCommands.put("P6")
+                      lastCommand = "P6"
+                      lastCommandChangeTime = time.time()
                   else:
                       print( file, " is an invalid state name" )
 
