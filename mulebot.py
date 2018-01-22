@@ -119,7 +119,16 @@ class MuleBot:
 
       """
 
-      pass
+      # Convert velocity from m/s to RPM
+      SECONDS_PER_MINUTE = 60
+      PI = 3.141592
+      INCHES_PER_METER = 39.3701
+
+      # rpm = ( meters per minute ) * INCHES_PER_METER / wheel diameter (inches)
+      rpm_l = (v_l * SECONDS_PER_MINUTE) * INCHES_PER_METER  / (MuleBot.WHEEL_RADIUS * 2 * PI)
+      rpm_r = (v_r * SECONDS_PER_MINUTE) * INCHES_PER_METER  / (MuleBot.WHEEL_RADIUS * 2 * PI)
+
+      self.motorSpeed(rpm_l, rpm_r)
 
   def _uni_to_diff(self, v, omega):
     """ _uni_to_diff The is a "unicycle model".  It performs a unicycle to 
@@ -431,6 +440,29 @@ class MuleBot:
                   self.dcMotorRightTurn( count  )
                 elif command == 't':
                   self.test()
+                elif command == 'z':
+                  self.setMotorsDirection('f')
+
+                  # Get speeds (m/m)
+                  speeds = cmd[1:]
+                  comma_index = speeds.find(',')
+
+                  vmm_l = speeds[0: comma_index]
+                  vmm_r = speeds[comma_index + 1:]
+
+                  print("vmm_l: ", vmm_l)
+                  print("vmm_r: ", vmm_r)
+
+                  # Convert from meters per minute to meters per second
+                  v_l = float(vmm_l) / 60.0
+                  v_r = float(vmm_r) / 60.0
+
+                  print("v_l: ", v_l)
+                  print("v_r: ", v_r)
+
+
+                  self.set_wheel_drive_rates(v_l, v_r)
+
                 elif command == 'f' or command == 'r':
                   direction = command
                   print (direction)
@@ -438,7 +470,8 @@ class MuleBot:
 
                   index = 0
                   # TODO: Update this to get a float.
-                  speed = self.intFromStr( cmd, index )
+                  # speed = self.intFromStr( cmd, index )
+                  speed = float(cmd[1:])
 
                   self.motorSpeed(speed, speed)
                 elif command == 'd':
