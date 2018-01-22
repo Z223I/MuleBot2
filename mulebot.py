@@ -24,7 +24,9 @@ class MuleBot:
   # Am pretty sure this is to be width.  Not length. The script is using
   # the distrance between the two motor driven wheels.
   WHEEL_BASE_LENGTH = 20
+
   def __init__(self):
+    """__init__"""
 
     global GPIO
 
@@ -82,6 +84,7 @@ class MuleBot:
 
 
   def terminate(self):
+    """terminate"""
     self._running = False
 
 
@@ -92,6 +95,8 @@ class MuleBot:
   #servoMax = 4095       # Max pulse length out of 4096
 
   def setServoPulse(channel, pulse):
+    """setServoPulse"""
+
     pulseLength = 1000000                   # 1,000,000 us per second
     pulseLength /= 60                       # 60 Hz
     print ("%d us per period" % pulseLength)
@@ -146,12 +151,15 @@ class MuleBot:
     return v_l, v_r
 
   def motorDirection(self, motorPin, direction):
-  #  print "motorPin: ", motorPin
-  #  print "direction: ",  direction
+    """motorDirection"""
+    #  print "motorPin: ", motorPin
+    #  print "direction: ",  direction
     GPIO.output(motorPin, direction)
 
 
   def motorsDirection(self, direction):
+    """motorsDirection"""
+
     print (direction)
     if direction == 'r' or direction == 'R':
       self.motorDirection(self.motor1DirectionPin, self.motorReverse)
@@ -163,6 +171,8 @@ class MuleBot:
       print ("Direction forward")
 
   def dcMotorLeftTurn(self, duration):
+    """dcMotorLeftTurn"""
+
     print ("From dcMotorLeftTurn: ", self.dcMotorPWMDurationLeft)
     tempPWMDurationLeft = int( self.dcMotorPWMDurationLeft * 70 / 100 )  # 98
     self.pwm.setPWM(self.dcMotorLeftMotor, 0, tempPWMDurationLeft)
@@ -175,6 +185,8 @@ class MuleBot:
 
 
   def dcMotorRightTurn(self, duration):
+    """dcMotorRightTurn"""
+
     tempPWMDurationRight = int( self.dcMotorPWMDurationRight * 70 / 100 )
     self.pwm.setPWM(self.dcMotorRightMotor, 0, tempPWMDurationRight)
 
@@ -194,7 +206,6 @@ class MuleBot:
       @return: constrained wheel speed (rpm)
       """
 
-#      print ( "motorSpeed RPM: ", speedRPM )
       if speedRPM > self.motorMaxRPM:
         speedRPM = self.motorMaxRPM
 
@@ -206,15 +217,8 @@ class MuleBot:
       return speedRPM
 
 
-
-
-
-
-
-
-
-
   def motorSpeed(self, speedRPM_l, speedRPM_r):
+    """motorSpeed"""
 
     speedRPM_l = self.constrainSpeed(speedRPM_l)
     speedRPM_r = self.constrainSpeed(speedRPM_r)
@@ -237,6 +241,7 @@ class MuleBot:
 
 
   def init(self):
+    """init"""
 
     junk = 0
     # This is all interupt stuff for calibrating the speed
@@ -252,7 +257,7 @@ class MuleBot:
 
   def run1(self, _q1, _q2,_qWallDistance):
 
-      """This method, run1, is used to navigate the MuleBot to
+      """run1 is used to navigate the MuleBot to
        a desired distance from the wall.
 
        This method is a thread.
@@ -327,7 +332,7 @@ class MuleBot:
 
   def lidarNav(self, _q1, _q2):
 
-      """This method, lidarNav, is used to navigate the MuleBot to
+      """lidarNav is used to navigate the MuleBot to
        an object.
 
        This method is a thread.
@@ -386,12 +391,13 @@ class MuleBot:
 
  
   def intFromStr( self, _string, _index ):
+      """intFromStr extract an integer from a string."""
+
       list = re.findall( r'\d+', _string )
       return int( list[_index] )
 
-  """ run2 is a thread """
-
   def run2(self, _q2, _qWallDistance):
+        """ run2 is a thread """
         while self._running:
                 name = threading.currentThread().getName()
                 print ("Consumer thread 2:  ", name)
@@ -542,6 +548,8 @@ class MuleBot:
 
 
   def setMotorsDirection(self, _direction):
+    """setMotorsDirection sets both motors to the same direction. """
+
     if _direction == 'f' or _direction == 'F':
       self.motorDirection(self.motor1DirectionPin, self.motorForward)
       self.motorDirection(self.motor2DirectionPin, self.motorForward)
@@ -552,6 +560,7 @@ class MuleBot:
       print ("ERROR: setMotorsDirection bad parameter: " + direction)
 
   def shutdown(self):
+    """shutdown """
     count = 0
     self.pwm.setPWM(0, 0, count)
     self.pwm.setPWM(1, 0, count)
