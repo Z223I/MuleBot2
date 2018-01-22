@@ -1,6 +1,10 @@
 #!/usr/bin/python
 
 from Adafruit_PWM_Servo_Driver import PWM
+import sys
+sys.path.append("/home/pi/pythondev/RangeBot/RangeBot")
+from RangeBot import RangeBot
+
 import time
 
 import RPi.GPIO as GPIO
@@ -12,6 +16,14 @@ import os
 
 class MuleBot:
 
+  """ Class MuleBot
+  This class accepts driving commands from the keyboard and it also has
+  a target mode where it drives to the target."""
+
+  WHEEL_RADIUS = 2
+  # Am pretty sure this is to be width.  Not length. The script is using
+  # the distrance between the two motor driven wheels.
+  WHEEL_BASE_LENGTH = 20
   def __init__(self):
 
     global GPIO
@@ -40,7 +52,7 @@ class MuleBot:
     self.laserDetectLeftPin  = 6
     self.laserDetectRightPin = 5
 
-    self.motorMaxRPM = 12
+    self.motorMaxRPM = 12.0
 
     # Pin Setup:
     GPIO.setmode(GPIO.BCM) # Broadcom pin-numbering scheme
@@ -89,6 +101,49 @@ class MuleBot:
     pulse /= pulseLength
     self.pwm.setPWM(channel, 0, pulse)
 
+  def set_wheel_drive_rates(self, v_l, v_r):
+      """ set_wheel_drive_rates set the drive rates of the wheels to the 
+      specified velocities (m/s).
+
+
+      @type v_l:  float
+      @param v_l: velocity left wheel (m/s)
+
+      @type v_r: float
+      @param v_r: velocity right wheel (m/s)
+
+      """
+
+      pass
+
+  def _uni_to_diff(self, v, omega):
+    """ _uni_to_diff The is a "unicycle model".  It performs a unicycle to 
+    "differential drive model" mathematical translation.
+
+    This came from the 'Sobot Rimulator' by Nick McCrea.
+
+    @type v:  float
+    @param v: velocity (m/s)
+
+    @type omega: float
+    @param omega: angular velocity (rad/s)
+
+    @rtype: float
+    @return: v_l velocity left wheel (m/s)
+
+    @rtype: float
+    @return: v_r velocity right wheel (m/s)"""
+
+    # v = translation velocity (m/s)
+    # omega = angular velocity (rad/s)
+
+    R = MuleBot.WHEEL_RADIUS
+    L = MuleBot.WHEEL_BASE_LENGTH
+
+    v_l = ( (2.0 * v) - (omega * L) ) / (2.0 * R)
+    v_r = ( (2.0 * v) + (omega * L) ) / (2.0 * R)
+
+    return v_l, v_r
 
   def motorDirection(self, motorPin, direction):
   #  print "motorPin: ", motorPin
@@ -129,39 +184,55 @@ class MuleBot:
     # Go straight
     self.pwm.setPWM(self.dcMotorRightMotor, 0, self.dcMotorPWMDurationRight)
 
+  def constrainSpeed(self, speedRPM):
+      """constrainSpeed ensures 0 <= speedRPM <= max.
 
-  def motorSpeed(self, speedRPM):
+      @type speedRPM: float
+      @param speedRPM: wheel speedRPM (rpm)
 
-    #global dcMotorPWMDurationLeft
-    #global dcMotorPWMDurationRight
-    intSpeedRPM = int( speedRPM )
+      @rtype: float
+      @return: constrained wheel speed (rpm)
+      """
 
-    print ( "motorSpeed RPM: ", speedRPM )
-    if intSpeedRPM > self.motorMaxRPM:
-      speedRPM = 12
+#      print ( "motorSpeed RPM: ", speedRPM )
+      if speedRPM > self.motorMaxRPM:
+        speedRPM = self.motorMaxRPM
+
+      if speedRPM < 0.0:
+        speedRPM = 0.0
+
+      print ( "motorSpeed RPM adjusted: ", speedRPM )
+
+      return speedRPM
 
 
 
-      #TODO: What is going on here?  Should there be 
-      #      two different variables?
 
 
-    if intSpeedRPM < 0:
-      speedRPM = 0
 
-    print ( "motorSpeed RPM adjusted: ", speedRPM )
+
+
+
+
+  def motorSpeed(self, speedRPM_l, speedRPM_r):
+
+    speedRPM_l = self.constrainSpeed(speedRPM_l)
+    speedRPM_r = self.constrainSpeed(speedRPM_r)
 
 #   Left motor
-    pwmDuration = 4096 * intSpeedRPM / self.motorMaxRPM - 1
+    pwmDuration = 4096 * speedRPM_l / self.motorMaxRPM - 1
     pwmDuration = int( pwmDuration )
-    self.pwm.setPWM(self.dcMotorLeftMotor, 0, pwmDuration)
+    startOfPulse = 0
+    self.pwm.setPWM(self.dcMotorLeftMotor, startOfPulse, pwmDuration)
     self.dcMotorPWMDurationLeft = pwmDuration
 
 #   Right motor
     #Adjust for right motor being faster
-    pwmDuration = pwmDuration * 9851 / 10000  # x97.019779 percent 98.519113
+    pwmDuration = 4096 * speedRPM_r / self.motorMaxRPM - 1
+    pwmDuration = pwmDuration * 9851 / 10000  # 98.519113 percent
     pwmDuration = int( pwmDuration )
-    self.pwm.setPWM(self.dcMotorRightMotor, 0, pwmDuration)
+    startOfPulse = 0
+    self.pwm.setPWM(self.dcMotorRightMotor, startOfPulse, pwmDuration)
     self.dcMotorPWMDurationRight = pwmDuration
 
 
@@ -256,8 +327,8 @@ class MuleBot:
 
   def lidarNav(self, _q1, _q2):
 
-      """This method, run1, is used to navigate the MuleBot to
-       a desired distance from the wall.
+      """This method, lidarNav, is used to navigate the MuleBot to
+       an object.
 
        This method is a thread.
 
@@ -360,9 +431,10 @@ class MuleBot:
                   self.setMotorsDirection(direction)
 
                   index = 0
+                  # TODO: Update this to get a float.
                   speed = self.intFromStr( cmd, index )
 
-                  self.motorSpeed(speed)
+                  self.motorSpeed(speed, speed)
                 elif command == 'd':
                   index = 0
                   inches = self.intFromStr( cmd, index )
@@ -573,4 +645,3 @@ def test():
   totalDeltaTime = finishTime - startTime
   singleDeltaTime = totalDeltaTime / maxEvents
   print (singleDeltaTime, " * ", maxEvents, " = ", totalDeltaTime)
-
