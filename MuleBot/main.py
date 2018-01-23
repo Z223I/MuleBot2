@@ -3,15 +3,15 @@ import queue
 import time
 
 #from LL3Threaded.LidarLiteChild import LidarLiteChild
-from LidarLiteChild import LidarLiteChild
+#from LidarLiteChild import LidarLiteChild
 from Pro2 import Pro2
 
 #from Con1 import Con1
 from mulebot import MuleBot as Con1
 
 
-lidarLiteChild = LidarLiteChild()
-lidarLiteChild.init()
+#lidarLiteChild = LidarLiteChild()
+#lidarLiteChild.init()
 
 pro2 = Pro2()
 #con1 = Con1()
@@ -25,14 +25,14 @@ qQuit         = queue.Queue(maxsize=0)
 qWallDistance = queue.Queue(maxsize=0)
 
 
-lidarLiteChildThread  = threading.Thread(target=lidarLiteChild.run, args=(qNumbers,))
+#lidarLiteChildThread  = threading.Thread(target=lidarLiteChild.run, args=(qNumbers,))
 pro2Thread  = threading.Thread(target=pro2.run, args=(qCommands, qQuit, ))
 #con1Thread1 = threading.Thread(target=con1.run1, args=(qNumbers, qCommands, qWallDistance, ))
 con2Thread2 = threading.Thread(target=con2.run2, args=(qCommands, qWallDistance, ))
 stateLocationThread = threading.Thread(target=stateLocation.laserNav, args=(qCommands, ))
-lidarNavThread = threading.Thread(target=lidar_Nav.lidarNav, args=(qNumbers, qCommands, ))
+lidarNavThread = threading.Thread(target=lidar_Nav.lidarNav, args=(qCommands, ))
 
-lidarLiteChildThread.start()
+#lidarLiteChildThread.start()
 pro2Thread.start()
 #con1Thread1.start()
 con2Thread2.start()
@@ -45,7 +45,7 @@ qQuit.task_done()
 
 print ("Recieved quit command:")
 
-lidarLiteChild.terminate()
+#lidarLiteChild.terminate()
 pro2.terminate()
 #con1.terminate()
 con2.terminate()

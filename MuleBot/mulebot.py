@@ -339,64 +339,28 @@ class MuleBot:
           _q1.task_done()
 
 
-  def lidarNav(self, _q1, _q2):
+  def lidarNav(self, _q2):
 
       """lidarNav is used to navigate the MuleBot to
        an object.
 
        This method is a thread.
 
-       _q1 is the current distance to the wall.
-
        _q2 is used to send steering directions to the run2 thread."""
 
-
-      timeInRightTurn = 0
-      timeInLeftTurn = 0
+      # Create the RangeBot instance.
+      servo_channel = 4
+      range_bot = RangeBot(servo_channel)
 
       while self._running:
           #name = threading.currentThread().getName()
           #print "Consumer thread 1:  ", name
 
 
-          currentDistance = _q1.get();
-          print ("Current distance: ", currentDistance)
-
-          qSize = _q1.qsize()
-          if qSize > 1:
-            print ( "***** Distance Queue Size: ", qSize, " *****" )
-
           # Are we navigating?
           navigating = (self.distanceToWall > 0)
           if navigating:
               print ("Desired distance: ", self.distanceToWall)
-
-              accuracy = 0.5
-              # Navigate
-              if currentDistance < self.distanceToWall - accuracy:
-                  print ("Turn right >>>")
-                  timeInRightTurn += 1
-                  _q2.put('s1')
-              elif currentDistance > self.distanceToWall + accuracy:
-                  print ("Turn left <<<")
-                  timeInLeftTurn += 1
-                  _q2.put('p1')
-              else:
-                  if ( timeInRightTurn > 0 ):
-                      for i in range( timeInRightTurn ):
-                          _q2.put('p1')
-                      # Reset the time
-                      timeInRightTurn = 0
-                  if ( timeInLeftTurn > 0 ):
-                      for i in range( timeInLeftTurn ):
-                          _q2.put('s1')
-                      # Reset the time
-                      timeInLeftTurn = 0
-                  print ("On path.")
-          # end if 
-
-          _q1.task_done()
-
 
  
   def intFromStr( self, _string, _index ):
@@ -406,7 +370,9 @@ class MuleBot:
       return int( list[_index] )
 
   def run2(self, _q2, _qWallDistance):
-        """ run2 is a thread """
+        """ run2 is a thread
+        It is processing commands from the keyboard """
+
         while self._running:
                 name = threading.currentThread().getName()
                 print ("Consumer thread 2:  ", name)
@@ -419,9 +385,7 @@ class MuleBot:
                 if qSize > 1:
                   print ( "***** Command Queue Size: ", qSize, " *****" )
 
-
-
-                # Change speed of motors
+                # Change the command to lowercase
                 qCommand = qCommand.lower()
                 cmd = qCommand
                 command = cmd[0]
@@ -440,6 +404,24 @@ class MuleBot:
                   self.dcMotorRightTurn( count  )
                 elif command == 't':
                   self.test()
+                # n is for navigating using Lidar.
+                elif command == 'n':
+                    if len(cmd) >= 3:
+                        if cmd[1] == 'r':
+                            # get range to target
+                            target_range = cmd[2:]
+                            target_range = int(target_range)
+                            print("Target range: ", target_range)
+                        if cmd[1] == 'w':
+                            # get width of target
+                            target_width = cmd[2:]
+                            target_width = int(target_width)
+                            print("Target width: ", target_width)
+                        
+                    # end if
+
+
+
                 elif command == 'z':
                   self.setMotorsDirection('f')
 
@@ -469,8 +451,6 @@ class MuleBot:
                   self.setMotorsDirection(direction)
 
                   index = 0
-                  # TODO: Update this to get a float.
-                  # speed = self.intFromStr( cmd, index )
                   speed = float(cmd[1:])
 
                   self.motorSpeed(speed, speed)
