@@ -6,17 +6,18 @@ except ImportError:
 #import warnings
 #import sys
 
-#from unittest import TestCase  #, skipIf
 import unittest
-import time
+#import time
 
-from Servo import Servo
+import sys
+sys.path.append('/home/pi/pythondev/MuleBot2/MuleBot')
+print(sys.path)
+from mulebot import MuleBot
 
-class TestServo(unittest.TestCase):
-    CHANNEL = 4
+class TestMuleBot(unittest.TestCase):
 
     def setUp(self):
-        self.testservo = Servo(TestServo.CHANNEL)
+        self.test_mulebot = MuleBot()
 
     def tearDown(self):
         pass
@@ -27,48 +28,6 @@ class TestServo(unittest.TestCase):
         self.assertEqual(130, self.testservo.SERVO_MIN)
         self.assertEqual(630, self.testservo.SERVO_MAX)
 
-        self.assertEqual(self.testservo.SERVO_MIN, self.testservo.servo_min)
-        self.assertEqual(self.testservo.SERVO_MAX, self.testservo.servo_max)
-
-        self.assertEqual(-90, self.testservo.ANGLE_MIN)
-        self.assertEqual(+90, self.testservo.ANGLE_MAX)
-
-        self.assertEqual(self.testservo.ANGLE_MIN, self.testservo.angle_min)
-        self.assertEqual(self.testservo.ANGLE_MAX, self.testservo.angle_max)
-
-        self.assertEqual(self.testservo.angle, None)
-
-    def test_set_angle_valid_input(self):
-        self.testservo.set_angle(90)
-        self.assertEqual(self.testservo.angle, 90)
-        time.sleep(1)
-
-        self.testservo.set_angle(0)
-        self.assertEqual(self.testservo.angle, 0)
-        time.sleep(1)
-
-        self.testservo.set_angle(-90)
-        self.assertEqual(self.testservo.angle, -90)
-        time.sleep(1)
-
-        self.testservo.set_angle(-45)
-        self.assertEqual(self.testservo.angle, -45)
-        time.sleep(1)
-
-    def test_set_angle_invalid_input(self):
-        # This number is too high.  It should be reduced
-        # to the maximum allowed.
-        self.testservo.set_angle(90.5)
-        self.assertEqual(self.testservo.angle, 90)
-        time.sleep(1)
-
-        # This number is too low.  It should be increased
-        # to the minimum allowed.
-        self.testservo.set_angle(-90.1)
-        self.assertEqual(self.testservo.angle, -90)
-        time.sleep(1)
-
-#    def test_listify(self):
 
 
 
