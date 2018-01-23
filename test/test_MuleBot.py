@@ -22,6 +22,11 @@ class TestMuleBot(unittest.TestCase):
     def tearDown(self):
         pass
 
+    def test_class_variables(self):
+        self.assertEqual(MuleBot.WHEEL_RADIUS, 2)
+        self.assertEqual(MuleBot.WHEEL_BASE_LENGTH, 20)
+
+
     def test___init___(self):
         self.assertEqual(self.testservo.channel, TestServo.CHANNEL)
 
