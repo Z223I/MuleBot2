@@ -12,7 +12,7 @@ import threading
 import queue
 import re
 import os
-
+import math
 
 class MuleBot:
 
@@ -136,7 +136,7 @@ class MuleBot:
 
       # Convert velocity from m/s to RPM
       SECONDS_PER_MINUTE = 60
-      PI = math.pi()
+      PI = math.pi
       INCHES_PER_METER = 39.3701
 
       # rpm = ( meters per minute ) * INCHES_PER_METER / wheel diameter (inches)
@@ -248,16 +248,18 @@ class MuleBot:
     speedRPM_r = self.constrainSpeed(speedRPM_r)
 
 #   Left motor
-    pwmDuration = 4096 * speedRPM_l / self.motorMaxRPM - 1
+    pwmDuration = 4095.0 * speedRPM_l / self.motorMaxRPM
+    print("Duration float: ", pwmDuration)
     pwmDuration = int( pwmDuration )
+    print("Duration int: ", pwmDuration)
     startOfPulse = 0
     self.pwm.setPWM(self.dcMotorLeftMotor, startOfPulse, pwmDuration)
     self.dcMotorPWMDurationLeft = pwmDuration
 
 #   Right motor
     #Adjust for right motor being faster
-    pwmDuration = 4096 * speedRPM_r / self.motorMaxRPM - 1
-    pwmDuration = pwmDuration * 9851 / 10000  # 98.519113 percent
+    pwmDuration = 4095.0 * speedRPM_r / self.motorMaxRPM
+    pwmDuration = pwmDuration * 9852 / 10000  # 98.519113 percent
     pwmDuration = int( pwmDuration )
     startOfPulse = 0
     self.pwm.setPWM(self.dcMotorRightMotor, startOfPulse, pwmDuration)
@@ -365,7 +367,7 @@ class MuleBot:
       q_lidar_nav receives target range and width information."""
 
       # Create the RangeBot instance.
-      servo_channel = 4
+      servo_channel = 3
       range_bot = RangeBot(servo_channel)
 
       target_range = 0
@@ -522,6 +524,7 @@ class MuleBot:
 
                   index = 0
                   speed = float(cmd[1:])
+                  print("Speed: ", speed)
 
                   self.motorSpeed(speed, speed)
                 elif command == 'd':
