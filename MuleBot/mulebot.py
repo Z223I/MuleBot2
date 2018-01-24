@@ -57,6 +57,7 @@ class MuleBot:
     self.motorMaxRPM = 12.0
 
     # Pin Setup:
+    GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BCM) # Broadcom pin-numbering scheme
     GPIO.setup(self.pwmEnablePin,       GPIO.OUT)
     GPIO.setup(self.motor1DirectionPin, GPIO.OUT)
@@ -87,16 +88,16 @@ class MuleBot:
     """terminate"""
     self._running = False
 
-  def v():
+  def v(self):
       """v returns the velocity in m/s."""
 
       # PWM duration can go from 0 to 4095 with 4095 representing max rpm
       speed_percentage = float(self.dcMotorPWMDurationLeft) / 4095.0
 
       # Calculate max meters per minute
-      wheel_circum_inches = 2.0 * math.pi() * RangeBot.WHEEL_RADIUS
-      max_inches_per_minute = wheel_circum_inches * self.maxRPM
-      inches_per_meter = 39.7
+      wheel_circum_inches = 2.0 * math.pi * MuleBot.WHEEL_RADIUS
+      max_inches_per_minute = wheel_circum_inches * self.motorMaxRPM
+      inches_per_meter = 39.37
       max_m_per_minute = max_inches_per_minute / inches_per_meter
 
       m_per_s = speed_percentage * (max_m_per_minute / 60.0)
@@ -372,10 +373,12 @@ class MuleBot:
 
       target_range = 0
       target_width = 0
+      navigating = False
 
       while self._running:
-          #name = threading.currentThread().getName()
-          #print "Consumer thread x:  ", name
+          if navigating:
+              name = threading.currentThread().getName()
+              print("Consumer thread x:  ", name)
 
           if not q_lidar_nav.empty():
              command = q_lidar_nav.get()
@@ -390,44 +393,47 @@ class MuleBot:
           # Are we navigating?
           navigating = target_range > 0 and target_width > 0
           if navigating:
-              print ("distance: ", target_distance)
+              print("distance: ", target_range)
+              print("width: ", target_width)
+              time.sleep(2)
 
-              angle, range, hits = range_bot.execute_hunt(target_range, target_width)
+              angle, tgt_range, hits = range_bot.execute_hunt(target_range, target_width)
 
               # Stop if we are too close to the target
-              if range < 24:
+              if tgt_range < 24:
                   v_l = 0
                   v_r = 0
-                  set_wheel_drive_rates(v_l, v_r)
+                  self.set_wheel_drive_rates(v_l, v_r)
 
                   # setting the range to zero will stop any navigating.
                   target_range = 0
 
               else:
                   # Use the updated range for the next run.
-                  target_range = range
+                  target_range = tgt_range
 
                   # Turn based on the angle to target.
                   # Positive angles are left.
                   # Negative angles are right.
 
                   # Convert from degrees to radians.
-                  angle_rad = math.rad(angle)
+                  angle_rad = math.radians(angle)
 
                   # Navigate per the angle.
                   # What is our current velocity (m/s)
                   v = self.v()
                   omega = angle_rad
-                  v_l, v_r = _uni_to_diff(self, v, omega)
-                  set_wheel_drive_rates(v_l, v_r)
+                  v_l, v_r = self._uni_to_diff(v, omega)
+                  self.set_wheel_drive_rates(v_l, v_r)
                   # Sleep during the turn
                   time.sleep(1)
                   # Drive straight
                   omega = 0 # zero is no turn
-                  v_l, v_r = _uni_to_diff(self, v, omega)
-                  set_wheel_drive_rates(v_l, v_r)
-              # end else range < minimum allowed
+                  v_l, v_r = self._uni_to_diff(v, omega)
+                  self.set_wheel_drive_rates(v_l, v_r)
+              # end else tgt_range < minimum allowed
           # end if navigating
+          time.sleep(5)
 
 
   def intFromStr( self, _string, _index ):
@@ -444,11 +450,11 @@ class MuleBot:
         q_lidar_nav is target range and width pairs"""
 
         while self._running:
-                name = threading.currentThread().getName()
-                print ("Consumer thread 2:  ", name)
+#                name = threading.currentThread().getName()
+#                print ("Consumer thread 2:  ", name)
                 qCommand = _q2.get();
-                print ("Here is the command... ", qCommand)
-                print
+#                print ("Here is the command... ", qCommand)
+#                print
 
 
                 qSize = _q2.qsize()
@@ -554,23 +560,9 @@ class MuleBot:
 
           Arguments:  self
 
-          Purpose:  laserNav monitors the Laser Detector' state.
-                    The Laser Detector's computer executes a shell 
-                    script on the MuleBot's computer to establish a
-                    file whos name indicates the current state.
+          Purpose:  laserNav 
 
-                    Each file has the name format of '*.loc'.
-
-                    The state of the Laser Detector changes so slowly,
-                    that using files is probably fast enough.
       """
-
-      try:
-          # TODO:  I don't think this is catching the file not found error.
-          # At start of the thread, delete all loc[ation] files.
-          os.system( "rm *.loc" )
-      except:
-          pass
 
       lastCommandChangeTime = None
       lastCommand = None
