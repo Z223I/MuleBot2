@@ -23,14 +23,15 @@ qNumbers      = queue.Queue(maxsize=0)
 qCommands     = queue.Queue(maxsize=0)
 qQuit         = queue.Queue(maxsize=0)
 qWallDistance = queue.Queue(maxsize=0)
+q_lidar_nav   = queue.Queue(maxsize=0)
 
 
 #lidarLiteChildThread  = threading.Thread(target=lidarLiteChild.run, args=(qNumbers,))
 pro2Thread  = threading.Thread(target=pro2.run, args=(qCommands, qQuit, ))
 #con1Thread1 = threading.Thread(target=con1.run1, args=(qNumbers, qCommands, qWallDistance, ))
-con2Thread2 = threading.Thread(target=con2.run2, args=(qCommands, qWallDistance, ))
+con2Thread2 = threading.Thread(target=con2.run2, args=(qCommands, qWallDistance, q_lidar_nav))
 stateLocationThread = threading.Thread(target=stateLocation.laserNav, args=(qCommands, ))
-lidarNavThread = threading.Thread(target=lidar_Nav.lidarNav, args=(qCommands, ))
+lidarNavThread = threading.Thread(target=lidar_Nav.lidarNav, args=(qCommands, q_lidar_nav))
 
 #lidarLiteChildThread.start()
 pro2Thread.start()
@@ -71,6 +72,7 @@ qNumbers.join()
 print ("joined 3 queue(s)")
 qWallDistance.join()
 print ("joined 4 queue(s)")
-
+q_lidar_nav.join()
+print ("joined 5 queue(s)")
 
 print ("Bye!")

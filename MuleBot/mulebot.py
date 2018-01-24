@@ -87,6 +87,21 @@ class MuleBot:
     """terminate"""
     self._running = False
 
+  def v():
+      """v returns the velocity in m/s."""
+
+      # PWM duration can go from 0 to 4095 with 4095 representing max rpm
+      speed_percentage = float(self.dcMotorPWMDurationLeft) / 4095.0
+
+      # Calculate max meters per minute
+      wheel_circum_inches = 2.0 * math.pi() * RangeBot.WHEEL_RADIUS
+      max_inches_per_minute = wheel_circum_inches * self.maxRPM
+      inches_per_meter = 39.7
+      max_m_per_minute = max_inches_per_minute / inches_per_meter
+
+      m_per_s = speed_percentage * (max_m_per_minute / 60.0)
+
+      return m_per_s
 
   # I don't think setServoPulse is ever called.
   # Is the pulse parameter ever used?
@@ -121,7 +136,7 @@ class MuleBot:
 
       # Convert velocity from m/s to RPM
       SECONDS_PER_MINUTE = 60
-      PI = 3.141592
+      PI = math.pi()
       INCHES_PER_METER = 39.3701
 
       # rpm = ( meters per minute ) * INCHES_PER_METER / wheel diameter (inches)
@@ -339,39 +354,92 @@ class MuleBot:
           _q1.task_done()
 
 
-  def lidarNav(self, _q2):
+  def lidarNav(self, _q2, q_lidar_nav):
 
       """lidarNav is used to navigate the MuleBot to
-       an object.
+      an object.
 
-       This method is a thread.
+      This method is a thread.
 
-       _q2 is used to send steering directions to the run2 thread."""
+      _q2 is used to send steering directions to the run2 thread.
+      q_lidar_nav receives target range and width information."""
 
       # Create the RangeBot instance.
       servo_channel = 4
       range_bot = RangeBot(servo_channel)
 
+      target_range = 0
+      target_width = 0
+
       while self._running:
           #name = threading.currentThread().getName()
-          #print "Consumer thread 1:  ", name
+          #print "Consumer thread x:  ", name
+
+          if not q_lidar_nav.empty():
+             command = q_lidar_nav.get()
+             first_char = 0
+             if command[first_char] == 'r':
+               target_range = float( command[1:] )
+             if command[first_char] == 'w':
+               target_width = float( command[1:] )
+
 
 
           # Are we navigating?
-          navigating = (self.distanceToWall > 0)
+          navigating = target_range > 0 and target_width > 0
           if navigating:
-              print ("Desired distance: ", self.distanceToWall)
+              print ("distance: ", target_distance)
 
- 
+              angle, range, hits = range_bot.execute_hunt(target_range, target_width)
+
+              # Stop if we are too close to the target
+              if range < 24:
+                  v_l = 0
+                  v_r = 0
+                  set_wheel_drive_rates(v_l, v_r)
+
+                  # setting the range to zero will stop any navigating.
+                  target_range = 0
+
+              else:
+                  # Use the updated range for the next run.
+                  target_range = range
+
+                  # Turn based on the angle to target.
+                  # Positive angles are left.
+                  # Negative angles are right.
+
+                  # Convert from degrees to radians.
+                  angle_rad = math.rad(angle)
+
+                  # Navigate per the angle.
+                  # What is our current velocity (m/s)
+                  v = self.v()
+                  omega = angle_rad
+                  v_l, v_r = _uni_to_diff(self, v, omega)
+                  set_wheel_drive_rates(v_l, v_r)
+                  # Sleep during the turn
+                  time.sleep(1)
+                  # Drive straight
+                  omega = 0 # zero is no turn
+                  v_l, v_r = _uni_to_diff(self, v, omega)
+                  set_wheel_drive_rates(v_l, v_r)
+              # end else range < minimum allowed
+          # end if navigating
+
+
   def intFromStr( self, _string, _index ):
       """intFromStr extract an integer from a string."""
 
       list = re.findall( r'\d+', _string )
       return int( list[_index] )
 
-  def run2(self, _q2, _qWallDistance):
+  def run2(self, _q2, _qWallDistance, q_lidar_nav):
         """ run2 is a thread
-        It is processing commands from the keyboard """
+        It is processing commands from the keyboard
+        _q2 is a command queue
+        _qWallDistance is the ideal distance from the wall
+        q_lidar_nav is target range and width pairs"""
 
         while self._running:
                 name = threading.currentThread().getName()
@@ -412,11 +480,13 @@ class MuleBot:
                             target_range = cmd[2:]
                             target_range = int(target_range)
                             print("Target range: ", target_range)
+                            q_lidar_nav.put( 'r' + str(target_range) )
                         if cmd[1] == 'w':
                             # get width of target
                             target_width = cmd[2:]
                             target_width = int(target_width)
                             print("Target width: ", target_width)
+                            q_lidar_nav.put( 'w' + str(target_width) )
                         
                     # end if
 
