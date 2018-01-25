@@ -396,9 +396,9 @@ class MuleBot:
           if navigating:
               print("distance: ", target_range)
               print("width: ", target_width)
-              time.sleep(2)
 
-              angle, tgt_range, hits = range_bot.execute_hunt(target_range, target_width)
+              angle, tgt_range, hits = \
+                  range_bot.execute_hunt(target_range, target_width)
 
               # Stop if we are too close to the target
               if tgt_range < 24:

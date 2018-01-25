@@ -64,6 +64,52 @@ class TestMuleBot(unittest.TestCase):
         self.assertEqual(rpm_l, 0)
         self.assertEqual(rpm_r, 12)
 
+    def test__uni_to_diff(self):
+        pass
+
+    def test_motorDirection(self):
+        pass
+
+    def test_motorsDirection(self):
+        pass
+
+    def test_dcMotorLeftTurn(self):
+        pass
+
+    def test_dcMotorRightTurn(self):
+        pass
+
+    def test_constrainSpeed(self):
+        # TODO
+        pass
+
+    def test_motorSpeed(self):
+        # TODO
+        pass
+
+    def test_run1(self):
+        pass
+
+    def test_run2(self):
+        # maybe not used again
+        pass
+
+    def test_lidarNav(self):
+        pass
+
+    def test_laserNav(self):
+        # No.  This method needs deleted.
+        pass
+
+    def test_setMotorsDirection(self):
+        pass
+
+    def test_shutDown(self):
+        pass
+
+
+
+
     def test_motorSpeed_A(self):
         rpm_left = 0
         rpm_right = 0
