@@ -162,7 +162,7 @@ class TestMuleBot(unittest.TestCase):
 
     def test_lidarNav_should_i_stay_or_should_i_go_B(self):
         """test_lidarNav_should_i_stay_or_should_i_go_A sets the target
-        range large enough to MuleBot rolling"""
+         range large enough to MuleBot rolling"""
 
         tgt_range = self.test_mulebot.tgt_min_range + 1
         angle = 45
@@ -175,6 +175,17 @@ class TestMuleBot(unittest.TestCase):
 
         # The angle should be converted to radians
         self.assertEqual(angle_rad, math.radians(angle))
+
+    def test_lidarNav_turn_A(self):
+        """test_lidarNav_turn_A does a check to make sure there isn't a turn
+        when omega is 0."""
+
+        v = 0.0638372904
+        angle_rads = 0
+        v_l, v_r = self.test_mulebot.lidarNav_turn(v, angle_rads)
+
+        self.assertEqual(v_l, v)
+        self.assertEqual(v_r, v)
 
 
     def test_lidarNav(self):

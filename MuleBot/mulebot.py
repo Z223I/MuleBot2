@@ -406,6 +406,13 @@ class MuleBot:
       return target_range, angle_rad
 
 
+  def lidarNav_turn(self, v, angle_rad):
+      # Navigate per the angle.
+      omega = angle_rad
+      v_l, v_r = self._uni_to_diff(v, omega)
+      self.set_wheel_drive_rates(v_l, v_r)
+      return v_l, v_r
+
 
 
 
@@ -429,21 +436,11 @@ class MuleBot:
 
       while self._running:
 
-
-
-
           target_range, target_width = \
               self.lidarNav_queue_check(q_lidar_nav, target_range, target_width)
 
-
-
-
-
           # Are we navigating?
           navigating = target_range > 0 and target_width > 0
-
-
-
 
           if navigating:
               print("distance: ", target_range)
@@ -452,21 +449,27 @@ class MuleBot:
               angle, tgt_range, hits = \
                   range_bot.execute_hunt(target_range, target_width)
 
-
-
-
               target_range, angle_rad  = \
                   self.lidarNav_should_i_stay_or_should_i_go(tgt_range, angle)
 
 
+              # Is a turn required?
+              if target_range > 0 and not (angle_rad == 0):
+                  # A turn is required.
 
-              if target_range > 0:
-                  # Navigate per the angle.
                   # What is our current velocity (m/s)
                   v = self.v()
-                  omega = angle_rad
-                  v_l, v_r = self._uni_to_diff(v, omega)
-                  self.set_wheel_drive_rates(v_l, v_r)
+
+
+
+
+
+
+                  self.lidarNav_turn(v, angle_rad)
+
+
+
+
 
 
 
