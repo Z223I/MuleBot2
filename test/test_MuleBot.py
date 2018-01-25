@@ -8,6 +8,8 @@ except ImportError:
 
 import unittest
 #import time
+import queue
+import math
 
 import sys
 sys.path.append('/home/pi/pythondev/MuleBot2/MuleBot')
@@ -91,8 +93,89 @@ class TestMuleBot(unittest.TestCase):
         pass
 
     def test_run2(self):
-        # maybe not used again
         pass
+
+    def test_lidarNav_queue_check_A(self):
+        """test_lidarNav_queue_check_A uses an empty queue.  There should be
+        no change to the variables."""
+        q_lidar_nav = queue.Queue(maxsize=0)
+        target_range = 3
+        target_width = 4
+
+        ret_target_range, ret_target_width = \
+            self.test_mulebot.lidarNav_queue_check( \
+            q_lidar_nav, target_range, target_width)
+
+        self.assertEqual(ret_target_range, target_range)
+        self.assertEqual(ret_target_width, target_width)
+
+    def test_lidarNav_queue_check_B(self):
+        """test_lidarNav_queue_check_B uses a queue with a range command.  
+        only the range variable should change."""
+        q_lidar_nav = queue.Queue(maxsize=0)
+
+        queue_range = 43
+        q_lidar_nav.put("R" + str(queue_range))
+
+        target_range = 3
+        target_width = 4
+
+        ret_target_range, ret_target_width = \
+            self.test_mulebot.lidarNav_queue_check( \
+            q_lidar_nav, target_range, target_width)
+
+        self.assertEqual(ret_target_range, queue_range)
+        self.assertEqual(ret_target_width, target_width)
+
+    def test_lidarNav_queue_check_C(self):
+        """test_lidarNav_queue_check_C uses a queue with a width command.  
+        only the width variable should change."""
+        q_lidar_nav = queue.Queue(maxsize=0)
+
+        queue_width = 444
+        q_lidar_nav.put("w" + str(queue_width))
+
+        target_range = 3
+        target_width = 4
+
+        ret_target_range, ret_target_width = \
+            self.test_mulebot.lidarNav_queue_check( \
+            q_lidar_nav, target_range, target_width)
+
+        self.assertEqual(ret_target_range, target_range)
+        self.assertEqual(ret_target_width, queue_width)
+
+    def test_lidarNav_should_i_stay_or_should_i_go_A(self):
+        """test_lidarNav_should_i_stay_or_should_i_go_A sets the target
+        range small enough to stop MuleBot"""
+
+        tgt_range = self.test_mulebot.tgt_min_range - 1
+        angle = 45
+
+        target_range, angle_rad = \
+            self.test_mulebot.lidarNav_should_i_stay_or_should_i_go(tgt_range, angle)
+
+        # target_range should be zero because we are too close to the target.
+        self.assertEqual(target_range, 0)
+
+        # We don't care about the angle if the range is zero.
+
+    def test_lidarNav_should_i_stay_or_should_i_go_B(self):
+        """test_lidarNav_should_i_stay_or_should_i_go_A sets the target
+        range large enough to MuleBot rolling"""
+
+        tgt_range = self.test_mulebot.tgt_min_range + 1
+        angle = 45
+
+        target_range, angle_rad = \
+            self.test_mulebot.lidarNav_should_i_stay_or_should_i_go(tgt_range, angle)
+
+        # target_range should be the same.
+        self.assertEqual(target_range, tgt_range)
+
+        # The angle should be converted to radians
+        self.assertEqual(angle_rad, math.radians(angle))
+
 
     def test_lidarNav(self):
         pass

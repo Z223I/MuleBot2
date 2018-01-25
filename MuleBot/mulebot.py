@@ -83,6 +83,8 @@ class MuleBot:
     #count = 1
     self.pwm.setPWMFreq(1000)                        # Set frequency to 1000 Hz
 
+    self.tgt_min_range = 24
+
 
   def terminate(self):
     """terminate"""
@@ -358,6 +360,56 @@ class MuleBot:
           _q1.task_done()
 
 
+  def lidarNav_queue_check(self, q_lidar_nav, tgt_range, tgt_width):
+          target_range = tgt_range
+          target_width = tgt_width
+
+          # The leading 'n' has been stripped of in the run2 thread.
+          if not q_lidar_nav.empty():
+             command = q_lidar_nav.get()
+             command = command.lower()
+
+             first_char = 0
+             if command[first_char] == 'r':
+               target_range = float( command[1:] )
+             if command[first_char] == 'w':
+               target_width = float( command[1:] )
+
+          return target_range, target_width
+
+
+
+
+
+  def lidarNav_should_i_stay_or_should_i_go(self, tgt_range, angle):
+      # Stop if we are too close to the target
+      if tgt_range < self.tgt_min_range:
+          v_l = 0
+          v_r = 0
+          self.set_wheel_drive_rates(v_l, v_r)
+
+          # setting the range to zero will stop navigating.
+          target_range = 0
+          angle_rad = None
+
+      else:
+          # Use the updated range for the next run.
+          target_range = tgt_range
+
+          # Turn based on the angle to target.
+          # Positive angles are left.
+          # Negative angles are right.
+
+          # Convert from degrees to radians.
+          angle_rad = math.radians(angle)
+
+      return target_range, angle_rad
+
+
+
+
+
+
   def lidarNav(self, _q2, q_lidar_nav):
 
       """lidarNav is used to navigate the MuleBot to
@@ -374,25 +426,25 @@ class MuleBot:
 
       target_range = 0
       target_width = 0
-      navigating = False
 
       while self._running:
-          if navigating:
-              name = threading.currentThread().getName()
-              print("Consumer thread x:  ", name)
 
-          if not q_lidar_nav.empty():
-             command = q_lidar_nav.get()
-             first_char = 0
-             if command[first_char] == 'r':
-               target_range = float( command[1:] )
-             if command[first_char] == 'w':
-               target_width = float( command[1:] )
+
+
+
+          target_range, target_width = \
+              self.lidarNav_queue_check(q_lidar_nav, target_range, target_width)
+
+
 
 
 
           # Are we navigating?
           navigating = target_range > 0 and target_width > 0
+
+
+
+
           if navigating:
               print("distance: ", target_range)
               print("width: ", target_width)
@@ -400,40 +452,38 @@ class MuleBot:
               angle, tgt_range, hits = \
                   range_bot.execute_hunt(target_range, target_width)
 
-              # Stop if we are too close to the target
-              if tgt_range < 24:
-                  v_l = 0
-                  v_r = 0
-                  self.set_wheel_drive_rates(v_l, v_r)
 
-                  # setting the range to zero will stop any navigating.
-                  target_range = 0
 
-              else:
-                  # Use the updated range for the next run.
-                  target_range = tgt_range
 
-                  # Turn based on the angle to target.
-                  # Positive angles are left.
-                  # Negative angles are right.
+              target_range, angle_rad  = \
+                  self.lidarNav_should_i_stay_or_should_i_go(tgt_range, angle)
 
-                  # Convert from degrees to radians.
-                  angle_rad = math.radians(angle)
 
+
+              if target_range > 0:
                   # Navigate per the angle.
                   # What is our current velocity (m/s)
                   v = self.v()
                   omega = angle_rad
                   v_l, v_r = self._uni_to_diff(v, omega)
                   self.set_wheel_drive_rates(v_l, v_r)
+
+
+
+
                   # Sleep during the turn
                   time.sleep(1)
+
                   # Drive straight
                   omega = 0 # zero is no turn
                   v_l, v_r = self._uni_to_diff(v, omega)
                   self.set_wheel_drive_rates(v_l, v_r)
-              # end else tgt_range < minimum allowed
+              # end target range > 0
           # end if navigating
+
+
+
+
           time.sleep(5)
 
 
