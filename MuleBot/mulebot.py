@@ -124,7 +124,7 @@ class MuleBot:
 
   def set_wheel_drive_rates(self, v_l, v_r):
       """ set_wheel_drive_rates set the drive rates of the wheels to the 
-      specified velocities (m/s).
+      specified velocities (m/s).  The velocities are converted to RPM.
 
 
       @type v_l:  float
@@ -145,6 +145,7 @@ class MuleBot:
       rpm_r = (v_r * SECONDS_PER_MINUTE) * INCHES_PER_METER  / (MuleBot.WHEEL_RADIUS * 2 * PI)
 
       self.motorSpeed(rpm_l, rpm_r)
+      return rpm_l, rpm_r
 
   def _uni_to_diff(self, v, omega):
     """ _uni_to_diff The is a "unicycle model".  It performs a unicycle to 
