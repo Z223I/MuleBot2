@@ -211,13 +211,19 @@ class TestMuleBot(unittest.TestCase):
         """test_lidarNav_turn_A does a check to make sure there isn't a turn
         when omega is 0."""
 
-        v = TestMuleBot.MAX_VELOCITY_RADS_PER_SEC
+        v = TestMuleBot.MAX_VELOCITY_METERS_PER_SEC
         angle_rads = 0
         v_l, v_r = self.test_mulebot.lidarNav_turn(v, angle_rads)
+        # v_l and v_r in radians per second. v is in meters per second.
 
-        self.assertEqual(v_l, v)
-        self.assertEqual(v_r, v)
+        circum_in = 2.0 * math.pi * MuleBot.WHEEL_RADIUS
+        circum_m = circum_in / 39.3701
 
+        left_v = v_l * circum_m / 2
+        right_v = v_r * circum_m / 2
+
+        self.assertEqual(left_v, v)
+        self.assertEqual(right_v, v)
 
     def test_lidarNav(self):
         pass
