@@ -91,20 +91,32 @@ class MuleBot:
     self._running = False
 
   def v(self):
-      """v returns the velocity in m/s."""
+      """v returns the velocity in meters per second."""
+
+      # TODO This translation formula works, but needs simplified.
 
       # PWM duration can go from 0 to 4095 with 4095 representing max rpm
       speed_percentage = float(self.dcMotorPWMDurationLeft) / 4095.0
+      print("speed_percentage: ", speed_percentage)
 
-      # Calculate max meters per minute
-      wheel_circum_inches = 2.0 * math.pi * MuleBot.WHEEL_RADIUS
-      max_inches_per_minute = wheel_circum_inches * self.motorMaxRPM
-      inches_per_meter = 39.37
-      max_m_per_minute = max_inches_per_minute / inches_per_meter
+      rpm = speed_percentage * self.motorMaxRPM
+      print("rpm: ", rpm)
 
-      m_per_s = speed_percentage * (max_m_per_minute / 60.0)
+      secondsPerMinute = 60
+      revs_per_second = rpm / secondsPerMinute
+      print("revs_per_second", revs_per_second)
 
-      return m_per_s
+      inches_per_rev = 2.0 * math.pi * MuleBot.WHEEL_RADIUS
+      INCHES_PER_METER = 39.3701
+      meters_per_rev =  inches_per_rev / INCHES_PER_METER
+      print("meters_per_rev", meters_per_rev)
+
+      meters_per_second = meters_per_rev * rpm
+
+      return meters_per_second
+
+
+
 
   # I don't think setServoPulse is ever called.
   # Is the pulse parameter ever used?
@@ -126,25 +138,25 @@ class MuleBot:
 
   def set_wheel_drive_rates(self, v_l, v_r):
       """ set_wheel_drive_rates set the drive rates of the wheels to the 
-      specified velocities (m/s).  The velocities are converted to RPM.
+      specified velocities (rads/s).  The velocities are converted to RPM.
 
 
       @type v_l:  float
-      @param v_l: velocity left wheel (m/s)
+      @param v_l: velocity left wheel (rads/s)
 
       @type v_r: float
-      @param v_r: velocity right wheel (m/s)
+      @param v_r: velocity right wheel (rads/s)
 
       """
 
-      # Convert velocity from m/s to RPM
+      # Convert velocity from rads/s to RPM
       SECONDS_PER_MINUTE = 60
       PI = math.pi
-      INCHES_PER_METER = 39.3701
+      #INCHES_PER_METER = 39.3701
 
-      # rpm = ( meters per minute ) * INCHES_PER_METER / wheel diameter (inches)
-      rpm_l = (v_l * SECONDS_PER_MINUTE) * INCHES_PER_METER  / (MuleBot.WHEEL_RADIUS * 2 * PI)
-      rpm_r = (v_r * SECONDS_PER_MINUTE) * INCHES_PER_METER  / (MuleBot.WHEEL_RADIUS * 2 * PI)
+      # rpm = ( rads per sec ) * SECONDS_PER_MINUTE / ( 2 * pi )
+      rpm_l = (v_l * SECONDS_PER_MINUTE) / (2 * math.pi)
+      rpm_r = (v_r * SECONDS_PER_MINUTE) / (2 * math.pi)
 
       self.motorSpeed(rpm_l, rpm_r)
       return rpm_l, rpm_r
@@ -153,28 +165,42 @@ class MuleBot:
     """ _uni_to_diff The is a "unicycle model".  It performs a unicycle to 
     "differential drive model" mathematical translation.
 
+    NB: The input/output variable are in DIFFERENT units!  This is because
+    the units of R are (meters/radian) does the conversion.
+
     This came from the 'Sobot Rimulator' by Nick McCrea.
 
     @type v:  float
     @param v: velocity (m/s)
 
     @type omega: float
-    @param omega: angular velocity (rad/s)
+    @param omega: angular velocity (rads/s)
 
     @rtype: float
-    @return: v_l velocity left wheel (m/s)
+    @return: v_l velocity left wheel (rads/s)
 
     @rtype: float
-    @return: v_r velocity right wheel (m/s)"""
+    @return: v_r velocity right wheel (rads/s)"""
 
     # v = translation velocity (m/s)
     # omega = angular velocity (rad/s)
 
-    R = MuleBot.WHEEL_RADIUS
-    L = MuleBot.WHEEL_BASE_LENGTH
 
-    v_l = ( (2.0 * v) - (omega * L) ) / (2.0 * R)
-    v_r = ( (2.0 * v) + (omega * L) ) / (2.0 * R)
+    inches_per_meter = 39.3701
+    circumference_in = 2.0 * math.pi * MuleBot.WHEEL_RADIUS
+    circumference_m = circumference_in / inches_per_meter
+    radians_per_circumference = 2.0
+    # R = roll?(meters/radian)
+    R = circumference_m / radians_per_circumference
+
+    # Get info in inches
+    Lin = MuleBot.WHEEL_BASE_LENGTH
+    # Convert inches to meters
+    Lm = Lin / inches_per_meter
+
+    # All measurements are now metric.
+    v_l = ( (2.0 * v) - (omega * Lm) ) / (2.0 * R)
+    v_r = ( (2.0 * v) + (omega * Lm) ) / (2.0 * R)
 
     return v_l, v_r
 

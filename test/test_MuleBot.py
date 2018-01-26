@@ -19,6 +19,9 @@ import RPi.GPIO as GPIO
 
 
 class TestMuleBot(unittest.TestCase):
+    MAX_VELOCITY_RADS_PER_SEC = 1.256637061436
+    MAX_VELOCITY_METERS_PER_SEC = 3.830227695
+    SECONDS_PER_MINUTE = 60
 
     def setUp(self):
         self.test_mulebot = MuleBot()
@@ -31,9 +34,22 @@ class TestMuleBot(unittest.TestCase):
         self.assertEqual(MuleBot.WHEEL_BASE_LENGTH, 20)
 
     def test_v(self):
+        # vel and check_vel_m are in meters per second
         self.test_mulebot.dcMotorPWMDurationLeft = 4095
         vel = int(self.test_mulebot.v() * 10000) / 10000
-        self.assertEqual(vel, 0.0638)
+
+        circum_in = 2 * math.pi * MuleBot.WHEEL_RADIUS
+
+        check_vel_in = self.test_mulebot.motorMaxRPM * circum_in
+
+        INCHES_PER_METER = 39.3701
+        check_vel_m = check_vel_in / INCHES_PER_METER
+
+
+        check_vel_m = int(check_vel_m * 10000) / 10000
+        print("check_vel_m: ", check_vel_m)
+
+        self.assertEqual(vel, check_vel_m)
 
         self.test_mulebot.dcMotorPWMDurationLeft = 0
         self.assertEqual(self.test_mulebot.v(), 0)
@@ -52,14 +68,16 @@ class TestMuleBot(unittest.TestCase):
 
 
     def test_set_wheel_drive_rates(self):
-        vel_l = 0.0638372904
+        vel_l = TestMuleBot.MAX_VELOCITY_RADS_PER_SEC
         vel_r = 0.0
+
         rpm_l, rpm_r = self.test_mulebot.set_wheel_drive_rates(vel_l, vel_r)
         rpm_l = int(rpm_l * 1000) / 1000
+
         self.assertEqual(rpm_l, 12)
         self.assertEqual(rpm_r, 0)
 
-        vel_r = 0.0638372904
+        vel_r = TestMuleBot.MAX_VELOCITY_RADS_PER_SEC
         vel_l = 0.0
         rpm_l, rpm_r = self.test_mulebot.set_wheel_drive_rates(vel_l, vel_r)
         rpm_r = int(rpm_r * 1000) / 1000
@@ -67,7 +85,20 @@ class TestMuleBot(unittest.TestCase):
         self.assertEqual(rpm_r, 12)
 
     def test__uni_to_diff(self):
-        pass
+        v = TestMuleBot.MAX_VELOCITY_METERS_PER_SEC
+        omega = 0.0
+
+        v_l, v_r = self.test_mulebot._uni_to_diff(v, omega)
+        # v_l and v_r in radians per second. v is in meters per second.
+
+        circum_in = 2.0 * math.pi * MuleBot.WHEEL_RADIUS
+        circum_m = circum_in / 39.3701
+
+        left_v = v_l * circum_m / 2
+        right_v = v_r * circum_m / 2
+
+        self.assertEqual(left_v, v)
+        self.assertEqual(right_v, v)
 
     def test_motorDirection(self):
         pass
@@ -180,7 +211,7 @@ class TestMuleBot(unittest.TestCase):
         """test_lidarNav_turn_A does a check to make sure there isn't a turn
         when omega is 0."""
 
-        v = 0.0638372904
+        v = TestMuleBot.MAX_VELOCITY_RADS_PER_SEC
         angle_rads = 0
         v_l, v_r = self.test_mulebot.lidarNav_turn(v, angle_rads)
 
