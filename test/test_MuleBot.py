@@ -67,6 +67,31 @@ class TestMuleBot(unittest.TestCase):
 # TODO: Finish this.
 
 
+
+    def test_rps_to_mps(self):
+        # Establish a wheel with a one meter circumference.
+        INCHES_PER_METER = 39.3701
+        radius_in = INCHES_PER_METER / (2.0 * math.pi)
+        MuleBot.WHEEL_RADIUS = radius_in
+        circumference_in = 2.0 * math.pi * radius_in
+        self.assertEqual(circumference_in, INCHES_PER_METER)
+
+        # Set velocity (radians per second) to 2 which equals 360 degrees.
+        v_rps = 2.0
+        v_mps = self.test_mulebot.rps_to_mps(v_rps)
+
+        circumference_m = 1.0
+        self.assertEqual(v_mps, circumference_m)
+
+
+
+
+
+
+
+
+
+
     def test_set_wheel_drive_rates(self):
         vel_l = TestMuleBot.MAX_VELOCITY_RADS_PER_SEC
         vel_r = 0.0
@@ -219,6 +244,7 @@ class TestMuleBot(unittest.TestCase):
         circum_in = 2.0 * math.pi * MuleBot.WHEEL_RADIUS
         circum_m = circum_in / 39.3701
 
+        # Convert from (radians per second) to (m/s)
         left_v = v_l * circum_m / 2
         right_v = v_r * circum_m / 2
 

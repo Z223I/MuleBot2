@@ -90,6 +90,20 @@ class MuleBot:
     """terminate"""
     self._running = False
 
+
+
+  def rps_to_mps(self, rps):
+      # v_l and v_r in radians per second. v is in meters per second.
+
+      circum_in = 2.0 * math.pi * MuleBot.WHEEL_RADIUS
+      circum_m = circum_in / 39.3701
+
+      mps = rps * circum_m / 2
+      return mps
+
+
+
+
   def v(self):
       """v returns the velocity in meters per second."""
 
@@ -408,6 +422,21 @@ class MuleBot:
 
 
   def lidarNav_should_i_stay_or_should_i_go(self, tgt_range, angle):
+      """lidarNav_should_i_stay_or_should_i_go will stay/stop if MuleBot is
+      too close to the target.  Otherwise, it will go/continue.
+
+      @type tgt_range: float
+      @param : (inches)
+
+      @type angle: float
+      @param : (degrees)
+
+      @rtype: float
+      @return: target_range (inches)
+
+      @rtype: float
+      @return: angle (radians)
+      """
       # Stop if we are too close to the target
       if tgt_range < self.tgt_min_range:
           v_l = 0
@@ -435,6 +464,8 @@ class MuleBot:
   def lidarNav_turn(self, v, angle_rad):
       # Navigate per the angle.
       omega = angle_rad
+
+      # v_l and v_r are in radians per second
       v_l, v_r = self._uni_to_diff(v, omega)
       self.set_wheel_drive_rates(v_l, v_r)
       return v_l, v_r
@@ -469,15 +500,19 @@ class MuleBot:
           navigating = target_range > 0 and target_width > 0
 
           if navigating:
-              print("distance: ", target_range)
-              print("width: ", target_width)
+              print("MuleBot.lidarNav: target_range: ", target_range)
+              print("MuleBot.lidarNav: target_width: ", target_width)
 
               angle, tgt_range, hits = \
                   range_bot.execute_hunt(target_range, target_width)
+              print("MuleBot.lidarNav: angle (deg): ", angle)
+              print("MuleBot.lidarNav: tgt_range (inches): ", tgt_range)
 
               target_range, angle_rad  = \
                   self.lidarNav_should_i_stay_or_should_i_go(tgt_range, angle)
-
+              print("MuleBot.lidarNav: target_range: ", target_range)
+              print("MuleBot.lidarNav: angle_rad: ", angle_rad)
+              input("Press [Enter] to continue.")
 
               # Is a turn required?
               if target_range > 0 and not (angle_rad == 0):
@@ -485,6 +520,8 @@ class MuleBot:
 
                   # What is our current velocity (m/s)
                   v = self.v()
+                  print("MuleBot.lidarNav: v (m/s): ", v)
+                  input("Press [Enter] to continue.")
 
 
 
@@ -492,6 +529,8 @@ class MuleBot:
 
 
                   self.lidarNav_turn(v, angle_rad)
+                  print("MuleBot.lidarNav: v (m/s): ", v)
+                  input("Press [Enter] to continue.")
 
 
 
@@ -812,3 +851,21 @@ def test():
   totalDeltaTime = finishTime - startTime
   singleDeltaTime = totalDeltaTime / maxEvents
   print (singleDeltaTime, " * ", maxEvents, " = ", totalDeltaTime)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
