@@ -93,6 +93,13 @@ class MuleBot:
 
 
   def rps_to_mps(self, rps):
+      """rps_to_mps transforms radians per second to meters per second.
+
+      @type: float
+      @param: rps (radians per second)
+
+      @rtype: float
+      @param: mps (meters per second)"""
       # v_l and v_r in radians per second. v is in meters per second.
 
       circum_in = 2.0 * math.pi * MuleBot.WHEEL_RADIUS
@@ -100,6 +107,20 @@ class MuleBot:
 
       mps = rps * circum_m / 2
       return mps
+
+  def rps_to_rpm(self, rps):
+      """rps_to_rpm transforms radians per second to RPM.
+
+      @type: float
+      @param: rps (radians per second)
+
+      @rtype: float
+      @param: rpm"""
+
+      SECONDS_PER_MINUTE = 60
+      RADIANS_IN_CIRCLE = 2
+      rpm = rps * SECONDS_PER_MINUTE / RADIANS_IN_CIRCLE
+      return rpm
 
 
 
@@ -110,6 +131,7 @@ class MuleBot:
       # TODO This translation formula works, but needs simplified.
 
       # PWM duration can go from 0 to 4095 with 4095 representing max rpm
+      print("MuleBot.v  self.dcMotorPWMDurationLeft:", self.dcMotorPWMDurationLeft)
       speed_percentage = float(self.dcMotorPWMDurationLeft) / 4095.0
       print("speed_percentage: ", speed_percentage)
 
@@ -163,14 +185,9 @@ class MuleBot:
 
       """
 
-      # Convert velocity from rads/s to RPM
-      SECONDS_PER_MINUTE = 60
-      PI = math.pi
-      #INCHES_PER_METER = 39.3701
-
-      # rpm = ( rads per sec ) * SECONDS_PER_MINUTE / ( 2 * pi )
-      rpm_l = (v_l * SECONDS_PER_MINUTE) / (2 * math.pi)
-      rpm_r = (v_r * SECONDS_PER_MINUTE) / (2 * math.pi)
+      # convert to rpm
+      rpm_l = self.rps_to_rpm(v_l)
+      rpm_r = self.rps_to_rpm(v_r)
 
       self.motorSpeed(rpm_l, rpm_r)
       return rpm_l, rpm_r
@@ -286,16 +303,24 @@ class MuleBot:
 
 
   def motorSpeed(self, speedRPM_l, speedRPM_r):
-    """motorSpeed"""
+    """motorSpeed sets the speed of the motors to the supplied rpm.
+
+    @type: float
+    @param: speedRPM_l (rpm)
+
+    @type: float
+    @param: speedRPM_r (rpm)
+
+    """
 
     speedRPM_l = self.constrainSpeed(speedRPM_l)
     speedRPM_r = self.constrainSpeed(speedRPM_r)
 
 #   Left motor
     pwmDuration = 4095.0 * speedRPM_l / self.motorMaxRPM
-    print("Duration float: ", pwmDuration)
+    print("MuleBot.motorSpeed Duration left float: ", pwmDuration)
     pwmDuration = int( pwmDuration )
-    print("Duration int: ", pwmDuration)
+    print("MuleBot.motorSpeed Duration left int: ", pwmDuration)
     startOfPulse = 0
     self.pwm.setPWM(self.dcMotorLeftMotor, startOfPulse, pwmDuration)
     self.dcMotorPWMDurationLeft = pwmDuration
@@ -462,11 +487,34 @@ class MuleBot:
 
 
   def lidarNav_turn(self, v, angle_rad):
+      """lidarNav performs a turn based on current velocity and angle.
+
+      The return values are used for testing.
+
+      @type: float
+      @param: v (meters per second)
+
+      @type: float
+      @param: angle_rad
+
+      @rtype: float
+      @param: v_l (radians per second)
+
+      @rtype: float
+      @param: v_r (radians per second)
+
+      """
+
+      print("MuleBot.lidarNav_turn({:.4f}(m/s), {:.4f}(rad))".format(v, angle_rad))
+
       # Navigate per the angle.
       omega = angle_rad
 
       # v_l and v_r are in radians per second
       v_l, v_r = self._uni_to_diff(v, omega)
+      print("MuleBot.lidarNav_turn v_l: {:.4f}(rps), v_r: {:.4f}(rps))".format(v_l, v_r))
+      input("[Enter] to continue.")
+
       self.set_wheel_drive_rates(v_l, v_r)
       return v_l, v_r
 
@@ -500,19 +548,25 @@ class MuleBot:
           navigating = target_range > 0 and target_width > 0
 
           if navigating:
-              print("MuleBot.lidarNav: target_range: ", target_range)
-              print("MuleBot.lidarNav: target_width: ", target_width)
+              v = self.v()
+              print("aMuleBot.lidarNav: v (m/s): ", v)
+              print("bMuleBot.lidarNav: target_range: ", target_range)
+              print("cMuleBot.lidarNav: target_width: ", target_width)
 
               angle, tgt_range, hits = \
                   range_bot.execute_hunt(target_range, target_width)
-              print("MuleBot.lidarNav: angle (deg): ", angle)
-              print("MuleBot.lidarNav: tgt_range (inches): ", tgt_range)
+              v = self.v()
+              print("dMuleBot.lidarNav: v (m/s): ", v)
+              print("eMuleBot.lidarNav: angle (deg): ", angle)
+              print("fMuleBot.lidarNav: tgt_range (inches): ", tgt_range)
 
               target_range, angle_rad  = \
                   self.lidarNav_should_i_stay_or_should_i_go(tgt_range, angle)
-              print("MuleBot.lidarNav: target_range: ", target_range)
-              print("MuleBot.lidarNav: angle_rad: ", angle_rad)
-              input("Press [Enter] to continue.")
+              v = self.v()
+              print("gMuleBot.lidarNav: v (m/s): ", v)
+              print("hMuleBot.lidarNav: target_range: ", target_range)
+              print("iMuleBot.lidarNav: angle_rad: ", angle_rad)
+#              input("Press [Enter] to continue.")
 
               # Is a turn required?
               if target_range > 0 and not (angle_rad == 0):
@@ -520,8 +574,8 @@ class MuleBot:
 
                   # What is our current velocity (m/s)
                   v = self.v()
-                  print("MuleBot.lidarNav: v (m/s): ", v)
-                  input("Press [Enter] to continue.")
+                  print("jMuleBot.lidarNav: v (m/s): ", v)
+#                  input("Press [Enter] to continue.")
 
 
 
@@ -529,8 +583,7 @@ class MuleBot:
 
 
                   self.lidarNav_turn(v, angle_rad)
-                  print("MuleBot.lidarNav: v (m/s): ", v)
-                  input("Press [Enter] to continue.")
+                  time.sleep(0.25)
 
 
 

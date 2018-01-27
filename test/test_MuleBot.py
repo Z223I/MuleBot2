@@ -19,9 +19,11 @@ import RPi.GPIO as GPIO
 
 
 class TestMuleBot(unittest.TestCase):
-    MAX_VELOCITY_RADS_PER_SEC = 1.256637061436
     MAX_VELOCITY_METERS_PER_SEC = 3.830227695
     SECONDS_PER_MINUTE = 60
+    MAX_RPM = 12
+    RADIANS_PER_REV = 2
+    MAX_VELOCITY_RADS_PER_SEC = MAX_RPM / SECONDS_PER_MINUTE * RADIANS_PER_REV
 
     def setUp(self):
         self.test_mulebot = MuleBot()
@@ -83,6 +85,17 @@ class TestMuleBot(unittest.TestCase):
         circumference_m = 1.0
         self.assertEqual(v_mps, circumference_m)
 
+    def test_rps_to_rpm(self):
+        """test_rps_to_rpm
+
+        2 radians = 1 rpm by definition."""
+
+        SECONDS_PER_MINUTES = 60
+        v_rps = 2.0 / SECONDS_PER_MINUTES
+        v_rpm = self.test_mulebot.rps_to_rpm(v_rps)
+
+        v_rpm_check = 1.0
+        self.assertEqual(v_rpm, v_rpm_check)
 
 
 
@@ -92,7 +105,8 @@ class TestMuleBot(unittest.TestCase):
 
 
 
-    def test_set_wheel_drive_rates(self):
+
+    def test_set_wheel_drive_rates_A(self):
         vel_l = TestMuleBot.MAX_VELOCITY_RADS_PER_SEC
         vel_r = 0.0
 
@@ -109,7 +123,19 @@ class TestMuleBot(unittest.TestCase):
         self.assertEqual(rpm_l, 0)
         self.assertEqual(rpm_r, 12)
 
-    def test__uni_to_diff(self):
+    def test_set_wheel_drive_rates_B(self):
+        # These numbers are from a test.
+
+        vel_l = 6.0 / TestMuleBot.SECONDS_PER_MINUTE # (radians per second)
+        vel_r = 6.0 / TestMuleBot.SECONDS_PER_MINUTE # (radians per second)
+
+        rpm_l, rpm_r = self.test_mulebot.set_wheel_drive_rates(vel_l, vel_r)
+        rpm_l = int(rpm_l * 1000) / 1000
+
+        self.assertEqual(rpm_l, 3.0)
+        self.assertEqual(rpm_r, 3.0)
+
+    def test__uni_to_diff_A(self):
         v = TestMuleBot.MAX_VELOCITY_METERS_PER_SEC
         omega = 0.0
 
@@ -124,6 +150,22 @@ class TestMuleBot(unittest.TestCase):
 
         self.assertEqual(left_v, v)
         self.assertEqual(right_v, v)
+
+    def test__uni_to_diff_B(self):
+        v = 0.9569
+        omega = 0.1356
+
+        v_l, v_r = self.test_mulebot._uni_to_diff(v, omega)
+        # v_l and v_r in radians per second. v is in meters per second.
+
+        circum_in = 2.0 * math.pi * MuleBot.WHEEL_RADIUS
+        circum_m = circum_in / 39.3701
+
+        left_v = v_l * circum_m / 2
+        right_v = v_r * circum_m / 2
+
+        self.assertLess(left_v, v)
+        self.assertGreater(right_v, v)
 
     def test_motorDirection(self):
         pass
@@ -141,9 +183,24 @@ class TestMuleBot(unittest.TestCase):
         # TODO
         pass
 
-    def test_motorSpeed(self):
-        # TODO
-        pass
+    def test_motorSpeed_A(self):
+        """test_motorSpeed_A sets bot wheels to zero rpm and then checks the pwmDuration.
+        """
+        rpm = 0
+
+        self.test_mulebot.motorSpeed(rpm, rpm)
+
+        self.assertEqual(self.test_mulebot.dcMotorPWMDurationLeft, 0)
+
+    def test_motorSpeed_B(self):
+        """test_motorSpeed_A sets bot wheels to zero rpm and then checks the pwmDuration.
+        """
+        rpm = self.test_mulebot.motorMaxRPM
+
+        self.test_mulebot.motorSpeed(rpm, rpm)
+
+        self.assertEqual(self.test_mulebot.dcMotorPWMDurationLeft, 4095)
+
 
     def test_run1(self):
         pass
@@ -241,15 +298,97 @@ class TestMuleBot(unittest.TestCase):
         v_l, v_r = self.test_mulebot.lidarNav_turn(v, angle_rads)
         # v_l and v_r in radians per second. v is in meters per second.
 
-        circum_in = 2.0 * math.pi * MuleBot.WHEEL_RADIUS
-        circum_m = circum_in / 39.3701
-
         # Convert from (radians per second) to (m/s)
-        left_v = v_l * circum_m / 2
-        right_v = v_r * circum_m / 2
+        left_v = self.test_mulebot.rps_to_mps(v_l)
+        right_v = self.test_mulebot.rps_to_mps(v_r)
 
         self.assertEqual(left_v, v)
         self.assertEqual(right_v, v)
+
+    def test_lidarNav_turn_B(self):
+        """test_lidarNav_turn_B does a check to 
+
+
+
+
+
+
+        ."""
+
+        # Set speed to half speed.
+        v = TestMuleBot.MAX_VELOCITY_METERS_PER_SEC / 2.0
+        angle_degrees = 1.0
+        angle_rads = math.radians(angle_degrees)
+
+        v_l, v_r = self.test_mulebot.lidarNav_turn(v, angle_rads)
+        # v_l and v_r in radians per second. v is in meters per second.
+
+        # Convert from (radians per second) to (m/s)
+        left_v = self.test_mulebot.rps_to_mps(v_l)
+        right_v = self.test_mulebot.rps_to_mps(v_r)
+
+        # This is not the correct assert.  Don't actually know how to test 
+        # this.
+        self.assertLess(left_v, v)
+        self.assertGreater(right_v, v)
+
+    def test_lidarNav_turn_C(self):
+        """test_lidarNav_turn_C does a check to 
+
+
+
+
+
+
+        ."""
+
+        # Set speed to half speed.
+        v = TestMuleBot.MAX_VELOCITY_METERS_PER_SEC / 2.0
+        angle_degrees = 3.0
+        angle_rads = math.radians(angle_degrees)
+
+        v_l, v_r = self.test_mulebot.lidarNav_turn(v, angle_rads)
+        # v_l and v_r in radians per second. v is in meters per second.
+
+        # Convert from (radians per second) to (m/s)
+        left_v = self.test_mulebot.rps_to_mps(v_l)
+        right_v = self.test_mulebot.rps_to_mps(v_r)
+
+        # This is not the correct assert.  Don't actually know how to test 
+        # this.
+        self.assertLess(left_v, v)
+        self.assertGreater(right_v, v)
+
+    def test_lidarNav_turn_D(self):
+        """test_lidarNav_turn_D does a check to 
+
+
+
+
+
+
+        ."""
+
+        # Set speed to quarter speed.
+        # This is from a run.
+        v = TestMuleBot.MAX_VELOCITY_METERS_PER_SEC / 4.0
+        angle_degrees = math.degrees(0.1356)
+        angle_rads = math.radians(angle_degrees)
+
+        v_l, v_r = self.test_mulebot.lidarNav_turn(v, angle_rads)
+        # v_l and v_r in radians per second. v is in meters per second.
+
+        # Convert from (radians per second) to (m/s)
+        left_v = self.test_mulebot.rps_to_mps(v_l)
+        right_v = self.test_mulebot.rps_to_mps(v_r)
+
+        # This is not the correct assert.  Don't actually know how to test 
+        # this.
+        self.assertLess(left_v, v)
+        self.assertGreater(right_v, v)
+
+
+
 
     def test_lidarNav(self):
         pass
