@@ -191,6 +191,8 @@ class MuleBot:
     self.pwm.setPWM(channel, 0, pulse)
 
   def set_wheel_drive_rates(self, v_l, v_r):
+      #TODO Update this to handle nevative velocities.
+
       """ set_wheel_drive_rates set the drive rates of the wheels to the 
       specified velocities (rads/s).  The velocities are converted to RPM.
 
@@ -323,9 +325,33 @@ class MuleBot:
 
       return speedRPM
 
+  def motors__Direction(self, speed_l, speed_r):
+    """motorDirection sets the direction of the motors based on the sign of
+    the speed.
+
+    @type: float
+    @param: speed_l
+
+    @type: float
+    @param: speed_r
+
+    """
+
+    if speed_l >= 0:
+      self.motorDirection(self.motor1DirectionPin, self.motorForward)
+    else:
+      self.motorDirection(self.motor1DirectionPin, self.motorReverse)
+
+    if speed_r >= 0:
+      self.motorDirection(self.motor2DirectionPin, self.motorForward)
+    else :
+      self.motorDirection(self.motor2DirectionPin, self.motorReverse)
+
+
 
   def motorSpeed(self, speedRPM_l, speedRPM_r):
-    """motorSpeed sets the speed of the motors to the supplied rpm.
+    """motorSpeed sets the speed of the motors to the supplied rpm.  This has
+    been updated to handle negative speeds.
 
     @type: float
     @param: speedRPM_l (rpm)
@@ -334,6 +360,11 @@ class MuleBot:
     @param: speedRPM_r (rpm)
 
     """
+
+    self.motors__Direction(speedRPM_l, speedRPM_r)
+
+    speedRPM_l = abs(speedRPM_l)
+    speedRPM_r = abs(speedRPM_r)
 
     speedRPM_l = self.constrainSpeed(speedRPM_l)
     speedRPM_r = self.constrainSpeed(speedRPM_r)
