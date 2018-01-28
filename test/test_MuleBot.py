@@ -47,6 +47,16 @@ class TestMuleBot(unittest.TestCase):
         INCHES_PER_METER = 39.3701
         check_vel_m = check_vel_in / INCHES_PER_METER
 
+        # Convert to per second
+        check_vel_m = check_vel_m / TestMuleBot.SECONDS_PER_MINUTE
+
+
+
+
+
+
+
+
 
         check_vel_m = int(check_vel_m * 10000) / 10000
         print("check_vel_m: ", check_vel_m)

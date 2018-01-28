@@ -21,9 +21,15 @@ class MuleBot:
   a target mode where it drives to the target."""
 
   WHEEL_RADIUS = 2
-  # Am pretty sure this is to be width.  Not length. The script is using
-  # the distrance between the two motor driven wheels.
+  # Apparently, in the robot world, the distrance between the two motor
+  # driven wheels is called wheel base length.
   WHEEL_BASE_LENGTH = 20
+  SECONDS_PER_MINUTE = 60
+  MAX_RPM = 12
+  MAX_Radians_PM = 2.0 * MAX_RPM
+  # MAX_RPS = Maximum Radians Per Second
+  MAX_RPS = MAX_Radians_PM / SECONDS_PER_MINUTE
+
 
   def __init__(self):
     """__init__"""
@@ -55,6 +61,7 @@ class MuleBot:
     self.laserDetectRightPin = 5
 
     self.motorMaxRPM = 12.0
+    self.motorMaxRadiansPM = 2 * self.motorMaxRPM
 
     # Pin Setup:
     GPIO.setwarnings(False)
@@ -83,7 +90,7 @@ class MuleBot:
     #count = 1
     self.pwm.setPWMFreq(1000)                        # Set frequency to 1000 Hz
 
-    self.tgt_min_range = 24
+    self.tgt_min_range = 12
 
 
   def terminate(self):
@@ -147,7 +154,7 @@ class MuleBot:
       meters_per_rev =  inches_per_rev / INCHES_PER_METER
       print("meters_per_rev", meters_per_rev)
 
-      meters_per_second = meters_per_rev * rpm
+      meters_per_second = meters_per_rev * revs_per_second
 
       return meters_per_second
 
@@ -193,6 +200,7 @@ class MuleBot:
       return rpm_l, rpm_r
 
   def _uni_to_diff(self, v, omega):
+
     """ _uni_to_diff The is a "unicycle model".  It performs a unicycle to 
     "differential drive model" mathematical translation.
 
@@ -216,6 +224,8 @@ class MuleBot:
     # v = translation velocity (m/s)
     # omega = angular velocity (rad/s)
 
+    # For some reason, it is necessary to multiply the angle by -1.
+    omega *= -1.0
 
     inches_per_meter = 39.3701
     circumference_in = 2.0 * math.pi * MuleBot.WHEEL_RADIUS
@@ -318,7 +328,7 @@ class MuleBot:
 
 #   Left motor
     pwmDuration = 4095.0 * speedRPM_l / self.motorMaxRPM
-    print("MuleBot.motorSpeed Duration left float: ", pwmDuration)
+#    print("MuleBot.motorSpeed Duration left float: ", pwmDuration)
     pwmDuration = int( pwmDuration )
     print("MuleBot.motorSpeed Duration left int: ", pwmDuration)
     startOfPulse = 0
@@ -330,6 +340,7 @@ class MuleBot:
     pwmDuration = 4095.0 * speedRPM_r / self.motorMaxRPM
     pwmDuration = pwmDuration * 9852 / 10000  # 98.519113 percent
     pwmDuration = int( pwmDuration )
+    print("MuleBot.motorSpeed Duration right int: ", pwmDuration)
     startOfPulse = 0
     self.pwm.setPWM(self.dcMotorRightMotor, startOfPulse, pwmDuration)
     self.dcMotorPWMDurationRight = pwmDuration
@@ -512,8 +523,16 @@ class MuleBot:
 
       # v_l and v_r are in radians per second
       v_l, v_r = self._uni_to_diff(v, omega)
+
+
       print("MuleBot.lidarNav_turn v_l: {:.4f}(rps), v_r: {:.4f}(rps))".format(v_l, v_r))
       input("[Enter] to continue.")
+
+
+
+
+
+
 
       self.set_wheel_drive_rates(v_l, v_r)
       return v_l, v_r
@@ -719,8 +738,8 @@ class MuleBot:
         # End while
 
 
-        time.sleep(2)
         self.shutdown()
+        time.sleep(2)
 
 
                 
@@ -817,7 +836,7 @@ class MuleBot:
 
     ### How to use the Enable Pin???
     #TODO:  Put this back in.
-    #GPIO.output(pwmEnablePin, GPIO.HIGH)
+    GPIO.output(pwmEnablePin, GPIO.HIGH)
     GPIO.cleanup()
     print
     print ("Good Bye!")
