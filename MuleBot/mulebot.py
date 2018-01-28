@@ -225,7 +225,8 @@ class MuleBot:
     # omega = angular velocity (rad/s)
 
     # For some reason, it is necessary to multiply the angle by -1.
-    omega *= -1.0
+    # TODO: Probably have to put this back in.
+    #omega *= -1.0
 
     inches_per_meter = 39.3701
     circumference_in = 2.0 * math.pi * MuleBot.WHEEL_RADIUS
@@ -496,17 +497,40 @@ class MuleBot:
 
       return target_range, angle_rad
 
+  def velocity_check(self, v_l, v_r):
+      """velocity_check slows down the velocities of the two wheels to stay
+      between -+MAX_RPS. 
+
+
+      @type: float
+      @param: v_l (radians per second)
+
+      @type: float
+      @param: v_r (radians per second)
+      """
+
+      if v_l == v_r:
+          turn_duration = 0
+      elif abs(v_l) > MuleBot.MAX_RPS or abs(v_r) > MuleBot.MAX_RPS:
+          v_l = 0
+          v_r = 0
+          turn_duration = 0
+      else:
+          turn_duration = 1
+
+      return v_l, v_r, turn_duration
+
 
   def lidarNav_turn(self, v, angle_rad):
       """lidarNav performs a turn based on current velocity and angle.
-
-      The return values are used for testing.
 
       @type: float
       @param: v (meters per second)
 
       @type: float
       @param: angle_rad
+
+      The return values are used for testing.
 
       @rtype: float
       @param: v_l (radians per second)
@@ -524,9 +548,10 @@ class MuleBot:
       # v_l and v_r are in radians per second
       v_l, v_r = self._uni_to_diff(v, omega)
 
+      v_l, v_r, duration = self.velocity_check(v_l, v_r)
 
       print("MuleBot.lidarNav_turn v_l: {:.4f}(rps), v_r: {:.4f}(rps))".format(v_l, v_r))
-      input("[Enter] to continue.")
+#      input("[Enter] to continue.")
 
 
 

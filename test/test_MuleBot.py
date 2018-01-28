@@ -35,6 +35,45 @@ class TestMuleBot(unittest.TestCase):
         self.assertEqual(MuleBot.WHEEL_RADIUS, 2)
         self.assertEqual(MuleBot.WHEEL_BASE_LENGTH, 20)
 
+
+    def test_velocity_check_A(self):
+        """test_velocity_check_A
+        If the velocities are the same, a turn isn't required.
+        """
+        v_l = 0
+        v_r = 0
+        v_l_ret, v_r_ret, duration = self.test_mulebot.velocity_check(v_l, v_r)
+
+        duration_check = 0
+        self.assertEqual(v_l_ret, v_l)
+        self.assertEqual(v_r_ret, v_r)
+        self.assertEqual(duration, duration_check)
+
+        v_l = MuleBot.MAX_RPS
+        v_r = MuleBot.MAX_RPS
+        v_l_ret, v_r_ret, duration = self.test_mulebot.velocity_check(v_l, v_r)
+
+        duration_check = 0
+        self.assertEqual(v_l_ret, v_l)
+        self.assertEqual(v_r_ret, v_r)
+        self.assertEqual(duration, duration_check)
+
+    def test_velocity_check_B(self):
+        """test_velocity_check_B
+        If the velocities are within +-MAX_RPS, the turn can be completed
+        in one second.
+        """
+        v_l = MuleBot.MAX_RPS
+        v_r = -MuleBot.MAX_RPS
+        v_l_ret, v_r_ret, duration = self.test_mulebot.velocity_check(v_l, v_r)
+
+        duration_check = 1
+        self.assertEqual(v_l_ret, v_l)
+        self.assertEqual(v_r_ret, v_r)
+        self.assertEqual(duration, duration_check)
+
+        
+
     def test_v(self):
         # vel and check_vel_m are in meters per second
         self.test_mulebot.dcMotorPWMDurationLeft = 4095
