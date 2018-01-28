@@ -234,6 +234,8 @@ class MuleBot:
     @rtype: float
     @return: v_r velocity right wheel (rads/s)"""
 
+    print("--MuleBot._uni_to_diff({:.3f}, {:.3f})".format(v, omega))
+
     # v = translation velocity (m/s)
     # omega = angular velocity (rad/s)
 
@@ -606,7 +608,7 @@ class MuleBot:
 
       """
 
-      print("MuleBot.lidarNav_turn({:.4f}(rad))".format(angle_rad))
+      print("--MuleBot.lidarNav_turn({:.4f}(rad))".format(angle_rad))
 
       # What is our current velocity (m/s)
       v = self.v()
