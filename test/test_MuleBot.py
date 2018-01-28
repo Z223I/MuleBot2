@@ -72,6 +72,24 @@ class TestMuleBot(unittest.TestCase):
         self.assertEqual(v_r_ret, v_r)
         self.assertEqual(duration, duration_check)
 
+
+    def test_velocity_check_C(self):
+        """test_velocity_check_C
+        Set the velocities outside of +-MAX_RPS, and make sure the duration
+        is over one second.
+        """
+
+        multiple = 2.0
+
+        v_l = MuleBot.MAX_RPS * multiple
+        v_r = -MuleBot.MAX_RPS * multiple
+        v_l_ret, v_r_ret, duration = self.test_mulebot.velocity_check(v_l, v_r)
+
+        duration_check = multiple
+        self.assertEqual(v_l_ret, MuleBot.MAX_RPS)
+        self.assertEqual(v_r_ret, -MuleBot.MAX_RPS)
+        self.assertEqual(duration, duration_check)
+
         
 
     def test_v(self):
@@ -337,107 +355,6 @@ class TestMuleBot(unittest.TestCase):
 
         # The angle should be converted to radians
         self.assertEqual(angle_rad, math.radians(angle))
-
-    def test_lidarNav_turn_A(self):
-        """test_lidarNav_turn_A does a check to make sure there isn't a turn
-        when omega is 0."""
-
-        v = TestMuleBot.MAX_VELOCITY_METERS_PER_SEC
-        angle_rads = 0
-        v_l, v_r = self.test_mulebot.lidarNav_turn(v, angle_rads)
-        # v_l and v_r in radians per second. v is in meters per second.
-
-        # Convert from (radians per second) to (m/s)
-        left_v = self.test_mulebot.rps_to_mps(v_l)
-        right_v = self.test_mulebot.rps_to_mps(v_r)
-
-        self.assertEqual(left_v, v)
-        self.assertEqual(right_v, v)
-
-    def test_lidarNav_turn_B(self):
-        """test_lidarNav_turn_B does a check to 
-
-
-
-
-
-
-        ."""
-
-        # Set speed to half speed.
-        v = TestMuleBot.MAX_VELOCITY_METERS_PER_SEC / 2.0
-        angle_degrees = 1.0
-        angle_rads = math.radians(angle_degrees)
-
-        v_l, v_r = self.test_mulebot.lidarNav_turn(v, angle_rads)
-        # v_l and v_r in radians per second. v is in meters per second.
-
-        # Convert from (radians per second) to (m/s)
-        left_v = self.test_mulebot.rps_to_mps(v_l)
-        right_v = self.test_mulebot.rps_to_mps(v_r)
-
-        # This is not the correct assert.  Don't actually know how to test 
-        # this.
-        self.assertLess(left_v, v)
-        self.assertGreater(right_v, v)
-
-    def test_lidarNav_turn_C(self):
-        """test_lidarNav_turn_C does a check to 
-
-
-
-
-
-
-        ."""
-
-        # Set speed to half speed.
-        v = TestMuleBot.MAX_VELOCITY_METERS_PER_SEC / 2.0
-        angle_degrees = 3.0
-        angle_rads = math.radians(angle_degrees)
-
-        v_l, v_r = self.test_mulebot.lidarNav_turn(v, angle_rads)
-        # v_l and v_r in radians per second. v is in meters per second.
-
-        # Convert from (radians per second) to (m/s)
-        left_v = self.test_mulebot.rps_to_mps(v_l)
-        right_v = self.test_mulebot.rps_to_mps(v_r)
-
-        # This is not the correct assert.  Don't actually know how to test 
-        # this.
-        self.assertLess(left_v, v)
-        self.assertGreater(right_v, v)
-
-    def test_lidarNav_turn_D(self):
-        """test_lidarNav_turn_D does a check to 
-
-
-
-
-
-
-        ."""
-
-        # Set speed to quarter speed.
-        # This is from a run.
-        v = TestMuleBot.MAX_VELOCITY_METERS_PER_SEC / 4.0
-        angle_degrees = math.degrees(0.1356)
-        angle_rads = math.radians(angle_degrees)
-
-        v_l, v_r = self.test_mulebot.lidarNav_turn(v, angle_rads)
-        # v_l and v_r in radians per second. v is in meters per second.
-
-        # Convert from (radians per second) to (m/s)
-        left_v = self.test_mulebot.rps_to_mps(v_l)
-        right_v = self.test_mulebot.rps_to_mps(v_r)
-
-        # This is not the correct assert.  Don't actually know how to test 
-        # this.
-        self.assertLess(left_v, v)
-        self.assertGreater(right_v, v)
-
-
-
 
     def test_lidarNav(self):
         pass

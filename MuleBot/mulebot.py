@@ -14,6 +14,17 @@ import re
 import os
 import math
 
+
+
+
+
+# TODO: set_wheel_drive_rates needs to be updated to deal with negative
+#       velocities.
+
+
+
+
+
 class MuleBot:
 
   """ Class MuleBot
@@ -499,7 +510,7 @@ class MuleBot:
 
   def velocity_check(self, v_l, v_r):
       """velocity_check slows down the velocities of the two wheels to stay
-      between -+MAX_RPS. 
+      between +-MAX_RPS. 
 
 
       @type: float
@@ -507,25 +518,46 @@ class MuleBot:
 
       @type: float
       @param: v_r (radians per second)
+
+      @rtype: float
+      @param: v_l_prime (radians per second)
+
+      @rtype: float
+      @param: v_r_prime (radians per second)
+
+      @rtype: float
+      @param: turn_duration (seconds)
       """
 
       if v_l == v_r:
           turn_duration = 0
-      elif abs(v_l) > MuleBot.MAX_RPS or abs(v_r) > MuleBot.MAX_RPS:
-          v_l = 0
-          v_r = 0
-          turn_duration = 0
-      else:
-          turn_duration = 1
+          return v_l, v_r, turn_duration
 
-      return v_l, v_r, turn_duration
+      # Assumption: The robot is going forward or is stationary when it is
+      #             hunting for the target, i.e., v >= 0.
+      # Assumption: It is not known which direction the robot needs to turn.
+      # Fact:       The return values of the _uni_to_diff method are symetrical
+      #             about v.
+      # Conclusion: Therefore it is only necessary to consider the larger of
+      #             v_l and v_r to determine the turn duration due to the RPM
+      #             limit of the motors.
+
+      vel_max = max(v_l, v_r)
+      turn_duration = vel_max / MuleBot.MAX_RPS
+
+      v = self.v()
+
+      # If v_? > v, v - v_? is negative. If you subract a negative, then
+      # it becomes an addition.  So, it ends up on the correct side of
+      # velocity.
+      v_l_prime = v - (v - v_l) / turn_duration
+      v_r_prime = v - (v - v_r) / turn_duration
+
+      return v_l_prime, v_r_prime, turn_duration
 
 
-  def lidarNav_turn(self, v, angle_rad):
-      """lidarNav performs a turn based on current velocity and angle.
-
-      @type: float
-      @param: v (meters per second)
+  def lidarNav_turn(self, angle_rad):
+      """lidarNav performs a turn based on an angle.
 
       @type: float
       @param: angle_rad
@@ -538,9 +570,15 @@ class MuleBot:
       @rtype: float
       @param: v_r (radians per second)
 
+      @rtype: float
+      @param: turn_duration (seconds)
+
       """
 
-      print("MuleBot.lidarNav_turn({:.4f}(m/s), {:.4f}(rad))".format(v, angle_rad))
+      print("MuleBot.lidarNav_turn({:.4f}(rad))".format(angle_rad))
+
+      # What is our current velocity (m/s)
+      v = self.v()
 
       # Navigate per the angle.
       omega = angle_rad
@@ -548,23 +586,18 @@ class MuleBot:
       # v_l and v_r are in radians per second
       v_l, v_r = self._uni_to_diff(v, omega)
 
-      v_l, v_r, duration = self.velocity_check(v_l, v_r)
-
-      print("MuleBot.lidarNav_turn v_l: {:.4f}(rps), v_r: {:.4f}(rps))".format(v_l, v_r))
-#      input("[Enter] to continue.")
-
-
-
-
-
-
-
+      v_l, v_r, turn_duration = self.velocity_check(v_l, v_r)
       self.set_wheel_drive_rates(v_l, v_r)
-      return v_l, v_r
 
+      # Sleep during the turn
+      time.sleep(turn_duration)
 
+      # Drive straight
+      omega = 0 # zero is no turn
+      v_l, v_r = self._uni_to_diff(v, omega)
+      self.set_wheel_drive_rates(v_l, v_r)
 
-
+      return v_l, v_r, turn_duration
 
   def lidarNav(self, _q2, q_lidar_nav):
 
@@ -615,41 +648,15 @@ class MuleBot:
               # Is a turn required?
               if target_range > 0 and not (angle_rad == 0):
                   # A turn is required.
+                  self.lidarNav_turn(angle_rad)
 
-                  # What is our current velocity (m/s)
-                  v = self.v()
-                  print("jMuleBot.lidarNav: v (m/s): ", v)
-#                  input("Press [Enter] to continue.")
-
-
-
-
-
-
-                  self.lidarNav_turn(v, angle_rad)
-                  time.sleep(0.25)
-
-
-
-
-
-
-
-
-                  # Sleep during the turn
-                  time.sleep(1)
-
-                  # Drive straight
-                  omega = 0 # zero is no turn
-                  v_l, v_r = self._uni_to_diff(v, omega)
-                  self.set_wheel_drive_rates(v_l, v_r)
               # end target range > 0
           # end if navigating
 
 
 
 
-          time.sleep(5)
+          time.sleep(2)
 
 
   def intFromStr( self, _string, _index ):
