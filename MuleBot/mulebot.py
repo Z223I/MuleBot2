@@ -237,7 +237,7 @@ class MuleBot:
 
     # For some reason, it is necessary to multiply the angle by -1.
     # TODO: Probably have to put this back in.
-    #omega *= -1.0
+    omega *= -1.0
 
     inches_per_meter = 39.3701
     circumference_in = 2.0 * math.pi * MuleBot.WHEEL_RADIUS
@@ -599,6 +599,8 @@ class MuleBot:
 
       return v_l, v_r, turn_duration
 
+
+
   def lidarNav(self, _q2, q_lidar_nav):
 
       """lidarNav is used to navigate the MuleBot to
@@ -613,8 +615,7 @@ class MuleBot:
       servo_channel = 3
       range_bot = RangeBot(servo_channel)
 
-      target_range = 0
-      target_width = 0
+      UPDATE_PERIOD = 2
 
       while self._running:
 
@@ -653,10 +654,7 @@ class MuleBot:
               # end target range > 0
           # end if navigating
 
-
-
-
-          time.sleep(2)
+          time.sleep(UPDATE_PERIOD)
 
 
   def intFromStr( self, _string, _index ):
