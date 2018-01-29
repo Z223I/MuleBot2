@@ -44,6 +44,9 @@ class MuleBot:
   INCHES_PER_METER = 39.3701
   CIRCUM_IN = RADIANS_IN_CIRCLE * math.pi * WHEEL_RADIUS
   CIRCUM_M = CIRCUM_IN / INCHES_PER_METER
+    
+  dcMotorPWMDurationLeft = 0
+  dcMotorPWMDurationRight = 0
 
 
   def __init__(self):
@@ -68,9 +71,6 @@ class MuleBot:
 
     self.dcMotorLeftMotor  = 0
     self.dcMotorRightMotor = 1
-    
-    self.dcMotorPWMDurationLeft = 0
-    self.dcMotorPWMDurationRight = 0
 
     self.laserDetectLeftPin  = 6
     self.laserDetectRightPin = 5
@@ -162,8 +162,8 @@ class MuleBot:
       # TODO This translation formula works, but needs simplified.
 
       # PWM duration can go from 0 to 4095 with 4095 representing max rpm
-      print("MuleBot.v  self.dcMotorPWMDurationLeft:", self.dcMotorPWMDurationLeft)
-      speed_percentage = float(self.dcMotorPWMDurationLeft) / 4095.0
+      print("MuleBot.v  MuleBot.dcMotorPWMDurationLeft:", MuleBot.dcMotorPWMDurationLeft)
+      speed_percentage = float(MuleBot.dcMotorPWMDurationLeft) / 4095.0
       print("speed_percentage: ", speed_percentage)
 
       rpm = speed_percentage * self.motorMaxRPM
@@ -306,28 +306,28 @@ class MuleBot:
   def dcMotorLeftTurn(self, duration):
     """dcMotorLeftTurn"""
 
-    print ("From dcMotorLeftTurn: ", self.dcMotorPWMDurationLeft)
-    tempPWMDurationLeft = int( self.dcMotorPWMDurationLeft * 70 / 100 )  # 98
+    print ("From dcMotorLeftTurn: ", MuleBot.dcMotorPWMDurationLeft)
+    tempPWMDurationLeft = int( MuleBot.dcMotorPWMDurationLeft * 70 / 100 )  # 98
     self.pwm.setPWM(self.dcMotorLeftMotor, 0, tempPWMDurationLeft)
 
     # Duration of the turn  
     time.sleep(duration)
 
     # Go straight
-    self.pwm.setPWM(self.dcMotorLeftMotor, 0, self.dcMotorPWMDurationLeft)
+    self.pwm.setPWM(self.dcMotorLeftMotor, 0, MuleBot.dcMotorPWMDurationLeft)
 
 
   def dcMotorRightTurn(self, duration):
     """dcMotorRightTurn"""
 
-    tempPWMDurationRight = int( self.dcMotorPWMDurationRight * 70 / 100 )
+    tempPWMDurationRight = int( MuleBot.dcMotorPWMDurationRight * 70 / 100 )
     self.pwm.setPWM(self.dcMotorRightMotor, 0, tempPWMDurationRight)
 
     # Duration of the turn  
     time.sleep(duration)
 
     # Go straight
-    self.pwm.setPWM(self.dcMotorRightMotor, 0, self.dcMotorPWMDurationRight)
+    self.pwm.setPWM(self.dcMotorRightMotor, 0, MuleBot.dcMotorPWMDurationRight)
 
   def constrainSpeed(self, speedRPM):
       """constrainSpeed ensures 0 <= speedRPM <= max.
@@ -400,7 +400,7 @@ class MuleBot:
     print("MuleBot.motorSpeed Duration left int: ", pwmDuration)
     startOfPulse = 0
     self.pwm.setPWM(self.dcMotorLeftMotor, startOfPulse, pwmDuration)
-    self.dcMotorPWMDurationLeft = pwmDuration
+    MuleBot.dcMotorPWMDurationLeft = pwmDuration
 
 #   Right motor
     #Adjust for right motor being faster
@@ -410,7 +410,7 @@ class MuleBot:
     print("MuleBot.motorSpeed Duration right int: ", pwmDuration)
     startOfPulse = 0
     self.pwm.setPWM(self.dcMotorRightMotor, startOfPulse, pwmDuration)
-    self.dcMotorPWMDurationRight = pwmDuration
+    MuleBot.dcMotorPWMDurationRight = pwmDuration
 
 
   def init(self):

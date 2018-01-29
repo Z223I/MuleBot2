@@ -94,7 +94,7 @@ class TestMuleBot(unittest.TestCase):
 
     def test_v_1(self):
         # vel and check_vel_m are in meters per second
-        self.test_mulebot.dcMotorPWMDurationLeft = 4095
+        MuleBot.dcMotorPWMDurationLeft = 4095
         vel = int(self.test_mulebot.v() * 10000) / 10000
 
         check_vel_m = MuleBot.CIRCUM_M * MuleBot.MAX_RPM
@@ -107,7 +107,7 @@ class TestMuleBot(unittest.TestCase):
 
         self.assertEqual(vel, check_vel_m)
 
-        self.test_mulebot.dcMotorPWMDurationLeft = 0
+        MuleBot.dcMotorPWMDurationLeft = 0
         self.assertEqual(self.test_mulebot.v(), 0)
 
     def test_v_2(self):
@@ -267,7 +267,7 @@ class TestMuleBot(unittest.TestCase):
 
         self.test_mulebot.motorSpeed(rpm, rpm)
 
-        self.assertEqual(self.test_mulebot.dcMotorPWMDurationLeft, 0)
+        self.assertEqual(MuleBot.dcMotorPWMDurationLeft, 0)
 
     def test_motorSpeed_B(self):
         """test_motorSpeed_A sets bot wheels to zero rpm and then checks the pwmDuration.
@@ -276,7 +276,7 @@ class TestMuleBot(unittest.TestCase):
 
         self.test_mulebot.motorSpeed(rpm, rpm)
 
-        self.assertEqual(self.test_mulebot.dcMotorPWMDurationLeft, 4095)
+        self.assertEqual(MuleBot.dcMotorPWMDurationLeft, 4095)
 
 
     def test_run1(self):
@@ -386,32 +386,32 @@ class TestMuleBot(unittest.TestCase):
         rpm_left = 0
         rpm_right = 0
         self.test_mulebot.motorSpeed(rpm_left, rpm_right)
-        self.assertEqual(self.test_mulebot.dcMotorPWMDurationLeft, 0)
-        self.assertEqual(self.test_mulebot.dcMotorPWMDurationRight, 0)
+        self.assertEqual(MuleBot.dcMotorPWMDurationLeft, 0)
+        self.assertEqual(MuleBot.dcMotorPWMDurationRight, 0)
 
     def test_motorSpeed_B(self):
         rpm_left = 12
         rpm_right = 12
         self.test_mulebot.motorSpeed(rpm_left, rpm_right)
-        self.assertEqual(self.test_mulebot.dcMotorPWMDurationLeft, 4095)
+        self.assertEqual(MuleBot.dcMotorPWMDurationLeft, 4095)
         # Can't actually test non-zero rpm for the right wheel, because
         # it has been adjusted due to it was too fast.
 
         # TODO: Store the const adjustment as a class variable.
         # retrieve that value, adjust and then test.
-        #self.assertEqual(self.test_mulebot.dcMotorPWMDurationRight, 4095)
+        #self.assertEqual(MuleBot.dcMotorPWMDurationRight, 4095)
 
     def test_motorSpeed_C(self):
         rpm_left = 6
         rpm_right = 6
         self.test_mulebot.motorSpeed(rpm_left, rpm_right)
-        self.assertEqual(self.test_mulebot.dcMotorPWMDurationLeft, 2047)
+        self.assertEqual(MuleBot.dcMotorPWMDurationLeft, 2047)
         # Can't actually test non-zero rpm for the right wheel, because
         # it has been adjusted due to it was too fast.
 
         # TODO: Store the const adjustment as a class variable.
         # retrieve that value, adjust and then test.
-        #self.assertEqual(self.test_mulebot.dcMotorPWMDurationRight, 2047)
+        #self.assertEqual(MuleBot.dcMotorPWMDurationRight, 2047)
 
 
 if __name__ == "__main__":
