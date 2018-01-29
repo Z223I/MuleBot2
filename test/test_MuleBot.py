@@ -97,23 +97,10 @@ class TestMuleBot(unittest.TestCase):
         self.test_mulebot.dcMotorPWMDurationLeft = 4095
         vel = int(self.test_mulebot.v() * 10000) / 10000
 
-        circum_in = 2 * math.pi * MuleBot.WHEEL_RADIUS
-
-        check_vel_in = self.test_mulebot.motorMaxRPM * circum_in
-
-        INCHES_PER_METER = 39.3701
-        check_vel_m = check_vel_in / INCHES_PER_METER
+        check_vel_m = MuleBot.CIRCUM_M * MuleBot.MAX_RPM
 
         # Convert to per second
-        check_vel_m = check_vel_m / TestMuleBot.SECONDS_PER_MINUTE
-
-
-
-
-
-
-
-
+        check_vel_m = check_vel_m / MuleBot.SECONDS_PER_MINUTE
 
         check_vel_m = int(check_vel_m * 10000) / 10000
         print("check_vel_m: ", check_vel_m)
@@ -122,6 +109,12 @@ class TestMuleBot(unittest.TestCase):
 
         self.test_mulebot.dcMotorPWMDurationLeft = 0
         self.assertEqual(self.test_mulebot.v(), 0)
+
+
+
+
+
+
 
     def test___init___(self):
         self.assertEqual(self.test_mulebot._running, True)

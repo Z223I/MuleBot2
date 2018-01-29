@@ -688,6 +688,11 @@ class MuleBot:
       # Override v_l and v_r
       v_l = self.mps_to_rps(v)
       v_r = self.mps_to_rps(v)
+
+      rpm = self.rps_to_rpm(v_l)
+      print("4l:   rpm: ", rpm)
+      rpm = self.rps_to_rpm(v_r)
+      print("4r:   rpm: ", rpm)
       self.set_wheel_drive_rates(v_l, v_r)
 
       return v_l, v_r, turn_duration
@@ -714,32 +719,39 @@ class MuleBot:
       target_width = 0
 
       while self._running:
+          v = self.v()
+          rpm = self.rps_to_rpm( self.mps_to_rps(v)  )
+          print("---1:   rpm: ", rpm)
 
           target_range, target_width = \
               self.lidarNav_queue_check(q_lidar_nav, target_range, target_width)
+
+          v = self.v()
+          rpm = self.rps_to_rpm( self.mps_to_rps(v)  )
+          print("---2:   rpm: ", rpm)
 
           # Are we navigating?
           navigating = target_range > 0 and target_width > 0
 
           if navigating:
               v = self.v()
-              print("aMuleBot.lidarNav: v (m/s): ", v)
-              print("bMuleBot.lidarNav: target_range: ", target_range)
-              print("cMuleBot.lidarNav: target_width: ", target_width)
+#              print("aMuleBot.lidarNav: v (m/s): ", v)
+#              print("bMuleBot.lidarNav: target_range: ", target_range)
+#              print("cMuleBot.lidarNav: target_width: ", target_width)
 
               angle, tgt_range, hits = \
                   range_bot.execute_hunt(target_range, target_width)
-              v = self.v()
-              print("dMuleBot.lidarNav: v (m/s): ", v)
-              print("eMuleBot.lidarNav: angle (deg): ", angle)
-              print("fMuleBot.lidarNav: tgt_range (inches): ", tgt_range)
+#              v = self.v()
+#              print("dMuleBot.lidarNav: v (m/s): ", v)
+#              print("eMuleBot.lidarNav: angle (deg): ", angle)
+#              print("fMuleBot.lidarNav: tgt_range (inches): ", tgt_range)
 
               target_range, angle_rad  = \
                   self.lidarNav_should_i_stay_or_should_i_go(tgt_range, angle)
-              v = self.v()
-              print("gMuleBot.lidarNav: v (m/s): ", v)
-              print("hMuleBot.lidarNav: target_range: ", target_range)
-              print("iMuleBot.lidarNav: angle_rad: ", angle_rad)
+#              v = self.v()
+#              print("gMuleBot.lidarNav: v (m/s): ", v)
+#              print("hMuleBot.lidarNav: target_range: ", target_range)
+#              print("iMuleBot.lidarNav: angle_rad: ", angle_rad)
 #              input("Press [Enter] to continue.")
 
               # Is a turn required?
