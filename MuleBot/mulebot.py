@@ -124,10 +124,13 @@ class MuleBot:
       @param: rps (radians per second)"""
 
       rps = mps * 2 / MuleBot.CIRCUM_M
-      return mps
+      return rps
 
   def rps_to_mps(self, rps):
       """rps_to_mps transforms radians per second to meters per second.
+
+      If rps = 2.0, then mps should equal MuleBot.CIRCUM_M because there are
+      2.0 radians in a circle.
 
       @type: float
       @param: rps (radians per second)
@@ -604,7 +607,7 @@ class MuleBot:
 
 
 
-      pdb.set_trace()
+#      pdb.set_trace()
       turn_duration = vel_max / MuleBot.MAX_RPS
 
       v = self.v()
@@ -644,6 +647,9 @@ class MuleBot:
       # What is our current velocity (m/s)
       v = self.v()
 
+      rpm = self.rps_to_rpm( self.mps_to_rps(v)  )
+      print("1:   rpm: ", rpm)
+
       # Navigate per the angle.
       omega = angle_rad
 
@@ -654,8 +660,19 @@ class MuleBot:
       # v_l and v_r are in radians per second
       v_l, v_r = self._uni_to_diff(v, omega)
 
+      rpm = self.rps_to_rpm(v_l)
+      print("2l:   rpm: ", rpm)
+      rpm = self.rps_to_rpm(v_r)
+      print("2r:   rpm: ", rpm)
+
 #      pdb.set_trace()
       v_l, v_r, turn_duration = self.velocity_check(v_l, v_r)
+
+      rpm = self.rps_to_rpm(v_l)
+      print("3l:   rpm: ", rpm)
+      rpm = self.rps_to_rpm(v_r)
+      print("3r:   rpm: ", rpm)
+
       self.set_wheel_drive_rates(v_l, v_r)
 
       # Sleep during the turn
@@ -945,7 +962,7 @@ class MuleBot:
 
     ### How to use the Enable Pin???
     #TODO:  Put this back in.
-    GPIO.output(pwmEnablePin, GPIO.HIGH)
+    GPIO.output(self.pwmEnablePin, GPIO.HIGH)
     GPIO.cleanup()
     print
     print ("Good Bye!")
