@@ -90,9 +90,9 @@ class TestMuleBot(unittest.TestCase):
         self.assertEqual(v_r_ret, -MuleBot.MAX_RPS)
         self.assertEqual(duration, duration_check)
 
-        
 
-    def test_v(self):
+
+    def test_v_1(self):
         # vel and check_vel_m are in meters per second
         self.test_mulebot.dcMotorPWMDurationLeft = 4095
         vel = int(self.test_mulebot.v() * 10000) / 10000
@@ -109,6 +109,21 @@ class TestMuleBot(unittest.TestCase):
 
         self.test_mulebot.dcMotorPWMDurationLeft = 0
         self.assertEqual(self.test_mulebot.v(), 0)
+
+    def test_v_2(self):
+        """test_v_2 uses two different instances of MuleBot. During testing 
+        it was discovered that this was causing a problem."""
+
+        test_mulebot2 = MuleBot()
+
+        rpm = MuleBot.MAX_RPM
+        self.test_mulebot.motorSpeed(rpm, rpm)
+
+        mps = self.test_mulebot.v()
+        mps2 = test_mulebot2.v()
+
+        self.assertEqual(mps, mps2)
+
 
 
 
