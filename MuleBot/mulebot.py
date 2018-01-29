@@ -37,9 +37,13 @@ class MuleBot:
   WHEEL_BASE_LENGTH = 20
   SECONDS_PER_MINUTE = 60
   MAX_RPM = 12
-  MAX_Radians_PM = 2.0 * MAX_RPM
+  RADIANS_IN_CIRCLE = 2.0
+  MAX_Radians_PM = RADIANS_IN_CIRCLE * MAX_RPM
   # MAX_RPS = Maximum Radians Per Second
   MAX_RPS = MAX_Radians_PM / SECONDS_PER_MINUTE
+  INCHES_PER_METER = 39.3701
+  CIRCUM_IN = RADIANS_IN_CIRCLE * math.pi * WHEEL_RADIUS
+  CIRCUM_M = CIRCUM_IN / INCHES_PER_METER
 
 
   def __init__(self):
@@ -110,6 +114,18 @@ class MuleBot:
 
 
 
+  def mps_to_rps(self, mps):
+      """mps_to_rps transforms meters per second to radians per second.
+
+      @type: float
+      @param: mps (meters per second)
+
+      @rtype: float
+      @param: rps (radians per second)"""
+
+      rps = mps * 2 / MuleBot.CIRCUM_M
+      return mps
+
   def rps_to_mps(self, rps):
       """rps_to_mps transforms radians per second to meters per second.
 
@@ -118,12 +134,8 @@ class MuleBot:
 
       @rtype: float
       @param: mps (meters per second)"""
-      # v_l and v_r in radians per second. v is in meters per second.
 
-      circum_in = 2.0 * math.pi * MuleBot.WHEEL_RADIUS
-      circum_m = circum_in / 39.3701
-
-      mps = rps * circum_m / 2
+      mps = rps * MuleBot.CIRCUM_M / 2
       return mps
 
   def rps_to_rpm(self, rps):
@@ -135,9 +147,7 @@ class MuleBot:
       @rtype: float
       @param: rpm"""
 
-      SECONDS_PER_MINUTE = 60
-      RADIANS_IN_CIRCLE = 2
-      rpm = rps * SECONDS_PER_MINUTE / RADIANS_IN_CIRCLE
+      rpm = rps * MuleBot.SECONDS_PER_MINUTE / MuleBot.RADIANS_IN_CIRCLE
       return rpm
 
 
@@ -656,8 +666,11 @@ class MuleBot:
 
 
 
-
+      # Something is wrong with _uni_to_diff.
       v_l, v_r = self._uni_to_diff(v, omega)
+      # Override v_l and v_r
+      v_l = self.mps_to_rps(v)
+      v_r = self.mps_to_rps(v)
       self.set_wheel_drive_rates(v_l, v_r)
 
       return v_l, v_r, turn_duration
@@ -679,6 +692,9 @@ class MuleBot:
       range_bot = RangeBot(servo_channel)
 
       UPDATE_PERIOD = 2
+
+      target_range = 0
+      target_width = 0
 
       while self._running:
 

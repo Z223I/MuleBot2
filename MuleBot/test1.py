@@ -17,6 +17,7 @@ bot = MuleBot()
 for i in range(5):
                   bot.setMotorsDirection('f')
 
+                  # This fixes the symptom, but not the problem.
                   bot.motorSpeed(3.0, 3.0)
                   time.sleep(1.5)
 
