@@ -162,25 +162,25 @@ class MuleBot:
       # TODO This translation formula works, but needs simplified.
 
       # PWM duration can go from 0 to 4095 with 4095 representing max rpm
-      print("MuleBot.v  MuleBot.dcMotorPWMDurationLeft:", MuleBot.dcMotorPWMDurationLeft)
+#      print("MuleBot.v  MuleBot.dcMotorPWMDurationLeft:", MuleBot.dcMotorPWMDurationLeft)
       speed_percentage = float(MuleBot.dcMotorPWMDurationLeft) / 4095.0
-      print("speed_percentage: ", speed_percentage)
+#      print("speed_percentage: ", speed_percentage)
 
       rpm = speed_percentage * self.motorMaxRPM
-      print("rpm: ", rpm)
+#      print("rpm: ", rpm)
 
       secondsPerMinute = 60
       revs_per_second = rpm / secondsPerMinute
-      print("--revs_per_second", revs_per_second)
+#      print("--revs_per_second", revs_per_second)
 
       inches_per_rev = 2.0 * math.pi * MuleBot.WHEEL_RADIUS
       INCHES_PER_METER = 39.3701
       meters_per_rev =  inches_per_rev / INCHES_PER_METER
-      print("--meters_per_rev", meters_per_rev)
+#      print("--meters_per_rev", meters_per_rev)
 
       meters_per_second = meters_per_rev * revs_per_second
 
-      print("--meters_per_second: ", meters_per_second)
+#      print("--meters_per_second: ", meters_per_second)
       return meters_per_second
 
 
@@ -220,12 +220,12 @@ class MuleBot:
       """
 
       # convert to rpm
-      print(">>v_l: ", v_l)
-      print(">>v_r: ", v_r)
+#      print(">>v_l: ", v_l)
+#      print(">>v_r: ", v_r)
       rpm_l = self.rps_to_rpm(v_l)
       rpm_r = self.rps_to_rpm(v_r)
-      print(">>rpm_l: ", rpm_l)
-      print(">>rpm_r: ", rpm_r)
+#      print(">>rpm_l: ", rpm_l)
+#      print(">>rpm_r: ", rpm_r)
 
       self.motorSpeed(rpm_l, rpm_r)
       return rpm_l, rpm_r
@@ -252,7 +252,7 @@ class MuleBot:
     @rtype: float
     @return: v_r velocity right wheel (rads/s)"""
 
-    print("--MuleBot._uni_to_diff({:.3f}, {:.3f})".format(v, omega))
+#    print("--MuleBot._uni_to_diff({:.3f}, {:.3f})".format(v, omega))
 
     # v = translation velocity (m/s)
     # omega = angular velocity (rad/s)
@@ -279,7 +279,7 @@ class MuleBot:
 
     rpm_l = self.rps_to_rpm(v_l)
     rpm_r = self.rps_to_rpm(v_r)
-    print("--MuleBot._uni_to_diff rpm_l, rpm_r: {:.3f}, {:.3f}".format(rpm_l, rpm_r))
+#    print("--MuleBot._uni_to_diff rpm_l, rpm_r: {:.3f}, {:.3f}".format(rpm_l, rpm_r))
 
     return v_l, v_r
 
@@ -345,7 +345,7 @@ class MuleBot:
       if speedRPM < 0.0:
         speedRPM = 0.0
 
-      print ( "motorSpeed RPM adjusted: ", speedRPM )
+#      print ( "motorSpeed RPM adjusted: ", speedRPM )
 
       return speedRPM
 
@@ -397,7 +397,7 @@ class MuleBot:
     pwmDuration = 4095.0 * speedRPM_l / self.motorMaxRPM
 #    print("MuleBot.motorSpeed Duration left float: ", pwmDuration)
     pwmDuration = int( pwmDuration )
-    print("MuleBot.motorSpeed Duration left int: ", pwmDuration)
+#    print("MuleBot.motorSpeed Duration left int: ", pwmDuration)
     startOfPulse = 0
     self.pwm.setPWM(self.dcMotorLeftMotor, startOfPulse, pwmDuration)
     MuleBot.dcMotorPWMDurationLeft = pwmDuration
@@ -648,7 +648,7 @@ class MuleBot:
       v = self.v()
 
       rpm = self.rps_to_rpm( self.mps_to_rps(v)  )
-      print("1:   rpm: ", rpm)
+#      print("1:   rpm: ", rpm)
 
       # Navigate per the angle.
       omega = angle_rad
@@ -661,17 +661,17 @@ class MuleBot:
       v_l, v_r = self._uni_to_diff(v, omega)
 
       rpm = self.rps_to_rpm(v_l)
-      print("2l:   rpm: ", rpm)
+#      print("2l:   rpm: ", rpm)
       rpm = self.rps_to_rpm(v_r)
-      print("2r:   rpm: ", rpm)
+#      print("2r:   rpm: ", rpm)
 
 #      pdb.set_trace()
       v_l, v_r, turn_duration = self.velocity_check(v_l, v_r)
 
       rpm = self.rps_to_rpm(v_l)
-      print("3l:   rpm: ", rpm)
+#      print("3l:   rpm: ", rpm)
       rpm = self.rps_to_rpm(v_r)
-      print("3r:   rpm: ", rpm)
+#      print("3r:   rpm: ", rpm)
 
       self.set_wheel_drive_rates(v_l, v_r)
 
@@ -690,9 +690,9 @@ class MuleBot:
       v_r = self.mps_to_rps(v)
 
       rpm = self.rps_to_rpm(v_l)
-      print("4l:   rpm: ", rpm)
+#      print("4l:   rpm: ", rpm)
       rpm = self.rps_to_rpm(v_r)
-      print("4r:   rpm: ", rpm)
+#      print("4r:   rpm: ", rpm)
       self.set_wheel_drive_rates(v_l, v_r)
 
       return v_l, v_r, turn_duration
@@ -721,14 +721,14 @@ class MuleBot:
       while self._running:
           v = self.v()
           rpm = self.rps_to_rpm( self.mps_to_rps(v)  )
-          print("---1:   rpm: ", rpm)
+#          print("---1:   rpm: ", rpm)
 
           target_range, target_width = \
               self.lidarNav_queue_check(q_lidar_nav, target_range, target_width)
 
           v = self.v()
           rpm = self.rps_to_rpm( self.mps_to_rps(v)  )
-          print("---2:   rpm: ", rpm)
+#          print("---2:   rpm: ", rpm)
 
           # Are we navigating?
           navigating = target_range > 0 and target_width > 0
