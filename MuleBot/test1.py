@@ -22,7 +22,7 @@ for i in range(5):
 
                   print(" ")
                   print(" ")
-                  angle_rad = math.radians(i / 6)
+                  angle_rad = math.radians((i + 1) / 1)
 
                   bot.lidarNav_turn(angle_rad)
 

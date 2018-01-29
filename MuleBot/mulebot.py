@@ -14,7 +14,7 @@ import re
 import os
 import math
 
-
+import pdb
 
 
 
@@ -158,15 +158,16 @@ class MuleBot:
 
       secondsPerMinute = 60
       revs_per_second = rpm / secondsPerMinute
-      print("revs_per_second", revs_per_second)
+      print("--revs_per_second", revs_per_second)
 
       inches_per_rev = 2.0 * math.pi * MuleBot.WHEEL_RADIUS
       INCHES_PER_METER = 39.3701
       meters_per_rev =  inches_per_rev / INCHES_PER_METER
-      print("meters_per_rev", meters_per_rev)
+      print("--meters_per_rev", meters_per_rev)
 
       meters_per_second = meters_per_rev * revs_per_second
 
+      print("--meters_per_second: ", meters_per_second)
       return meters_per_second
 
 
@@ -206,8 +207,12 @@ class MuleBot:
       """
 
       # convert to rpm
+      print(">>v_l: ", v_l)
+      print(">>v_r: ", v_r)
       rpm_l = self.rps_to_rpm(v_l)
       rpm_r = self.rps_to_rpm(v_r)
+      print(">>rpm_l: ", rpm_l)
+      print(">>rpm_r: ", rpm_r)
 
       self.motorSpeed(rpm_l, rpm_r)
       return rpm_l, rpm_r
@@ -258,6 +263,10 @@ class MuleBot:
     # All measurements are now metric.
     v_l = ( (2.0 * v) - (omega * Lm) ) / (2.0 * R)
     v_r = ( (2.0 * v) + (omega * Lm) ) / (2.0 * R)
+
+    rpm_l = self.rps_to_rpm(v_l)
+    rpm_r = self.rps_to_rpm(v_r)
+    print("--MuleBot._uni_to_diff rpm_l, rpm_r: {:.3f}, {:.3f}".format(rpm_l, rpm_r))
 
     return v_l, v_r
 
@@ -541,6 +550,8 @@ class MuleBot:
 
       return target_range, angle_rad
 
+
+
   def velocity_check(self, v_l, v_r):
       """velocity_check slows down the velocities of the two wheels to stay
       between +-MAX_RPS. 
@@ -576,6 +587,14 @@ class MuleBot:
       #             limit of the motors.
 
       vel_max = max(v_l, v_r)
+      if vel_max < MuleBot.MAX_RPS:
+          turn_duration = 1
+          return v_l, v_r, turn_duration
+
+
+
+
+      pdb.set_trace()
       turn_duration = vel_max / MuleBot.MAX_RPS
 
       v = self.v()
@@ -590,7 +609,7 @@ class MuleBot:
 
 
   def lidarNav_turn(self, angle_rad):
-      """lidarNav performs a turn based on an angle.
+      """lidarNav_turn performs a turn based on an angle.
 
       @type: float
       @param: angle_rad
@@ -610,15 +629,22 @@ class MuleBot:
 
       print("--MuleBot.lidarNav_turn({:.4f}(rad))".format(angle_rad))
 
+#      pdb.set_trace()
+
       # What is our current velocity (m/s)
       v = self.v()
 
       # Navigate per the angle.
       omega = angle_rad
 
+
+
+
+
       # v_l and v_r are in radians per second
       v_l, v_r = self._uni_to_diff(v, omega)
 
+#      pdb.set_trace()
       v_l, v_r, turn_duration = self.velocity_check(v_l, v_r)
       self.set_wheel_drive_rates(v_l, v_r)
 
@@ -627,6 +653,10 @@ class MuleBot:
 
       # Drive straight
       omega = 0 # zero is no turn
+
+
+
+
       v_l, v_r = self._uni_to_diff(v, omega)
       self.set_wheel_drive_rates(v_l, v_r)
 
