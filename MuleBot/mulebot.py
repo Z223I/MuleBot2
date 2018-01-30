@@ -407,7 +407,7 @@ class MuleBot:
     pwmDuration = 4095.0 * speedRPM_r / self.motorMaxRPM
     pwmDuration = pwmDuration * 9852 / 10000  # 98.519113 percent
     pwmDuration = int( pwmDuration )
-    print("MuleBot.motorSpeed Duration right int: ", pwmDuration)
+#    print("MuleBot.motorSpeed Duration right int: ", pwmDuration)
     startOfPulse = 0
     self.pwm.setPWM(self.dcMotorRightMotor, startOfPulse, pwmDuration)
     MuleBot.dcMotorPWMDurationRight = pwmDuration
@@ -756,8 +756,11 @@ class MuleBot:
 
               # Is a turn required?
               if target_range > 0 and not (angle_rad == 0):
-                  # A turn is required.
-                  self.lidarNav_turn(angle_rad)
+
+                  # Only make turns if target > 36 inches away.
+                  if target_range > 36:
+                      # A turn is required.
+                      self.lidarNav_turn(angle_rad)
 
               # end target range > 0
           # end if navigating
