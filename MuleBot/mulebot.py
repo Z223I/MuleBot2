@@ -640,7 +640,7 @@ class MuleBot:
 
       """
 
-      print("--MuleBot.lidarNav_turn({:.4f}(rad))".format(angle_rad))
+#      print("--MuleBot.lidarNav_turn({:.4f}(rad))".format(angle_rad))
 
 #      pdb.set_trace()
 
