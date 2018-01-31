@@ -714,6 +714,8 @@ class MuleBot:
       range_bot = RangeBot(servo_channel)
 
       UPDATE_PERIOD = 2
+      MINIMUM_MANUEVER_RANGE = 28
+      MINIMUM_ROBOT_RANGE = 12
 
       target_range = 0
       target_width = 0
@@ -746,24 +748,26 @@ class MuleBot:
 #              print("eMuleBot.lidarNav: angle (deg): ", angle)
 #              print("fMuleBot.lidarNav: tgt_range (inches): ", tgt_range)
 
-              target_range, angle_rad  = \
-                  self.lidarNav_should_i_stay_or_should_i_go(tgt_range, angle)
-#              v = self.v()
-#              print("gMuleBot.lidarNav: v (m/s): ", v)
-#              print("hMuleBot.lidarNav: target_range: ", target_range)
-#              print("iMuleBot.lidarNav: angle_rad: ", angle_rad)
-#              input("Press [Enter] to continue.")
+              if True:
 
-              # Is a turn required?
-              if target_range > 0 and not (angle_rad == 0):
+                  target_range, angle_rad  = \
+                      self.lidarNav_should_i_stay_or_should_i_go(tgt_range, angle)
+#                  v = self.v()
+#                  print("gMuleBot.lidarNav: v (m/s): ", v)
+#                  print("hMuleBot.lidarNav: target_range: ", target_range)
+#                  print("iMuleBot.lidarNav: angle_rad: ", angle_rad)
+#                  input("Press [Enter] to continue.")
 
-                  # Only make turns if target > 36 inches away.
-                  if target_range > 36:
-                      # A turn is required.
-                      self.lidarNav_turn(angle_rad)
+                  # Is a turn required?
+                  if target_range > 0 and not (angle_rad == 0):
 
-              # end target range > 0
-          # end if navigating
+                      # Only make turns if target >  inches away.
+                      if target_range > MINIMUM_MANUEVER_RANGE:
+                          # A turn is required.
+                          self.lidarNav_turn(angle_rad)
+
+                  # end target range > 0
+              # end if navigating
 
           time.sleep(UPDATE_PERIOD)
 
