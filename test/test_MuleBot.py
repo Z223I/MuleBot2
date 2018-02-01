@@ -14,7 +14,8 @@ import math
 import sys
 sys.path.append('/home/pi/pythondev/MuleBot2/MuleBot')
 #print(sys.path)
-from mulebot import MuleBot
+
+from MuleBot import MuleBot
 import RPi.GPIO as GPIO
 
 
