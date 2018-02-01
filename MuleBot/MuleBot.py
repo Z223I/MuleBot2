@@ -397,7 +397,7 @@ class MuleBot:
     pwmDuration = 4095.0 * speedRPM_l / self.motorMaxRPM
 #    print("MuleBot.motorSpeed Duration left float: ", pwmDuration)
     pwmDuration = int( pwmDuration )
-#    print("MuleBot.motorSpeed Duration left int: ", pwmDuration)
+    print("MuleBot.motorSpeed Duration left int: ", pwmDuration)
     startOfPulse = 0
     self.pwm.setPWM(self.dcMotorLeftMotor, startOfPulse, pwmDuration)
     MuleBot.dcMotorPWMDurationLeft = pwmDuration
@@ -405,9 +405,9 @@ class MuleBot:
 #   Right motor
     #Adjust for right motor being faster
     pwmDuration = 4095.0 * speedRPM_r / self.motorMaxRPM
-    pwmDuration = pwmDuration * 9852 / 10000  # 98.519113 percent
+    pwmDuration = pwmDuration * 9727 / 10000  # 98.519113 percent
     pwmDuration = int( pwmDuration )
-#    print("MuleBot.motorSpeed Duration right int: ", pwmDuration)
+    print("MuleBot.motorSpeed Duration right int: ", pwmDuration)
     startOfPulse = 0
     self.pwm.setPWM(self.dcMotorRightMotor, startOfPulse, pwmDuration)
     MuleBot.dcMotorPWMDurationRight = pwmDuration
@@ -713,9 +713,9 @@ class MuleBot:
       servo_channel = 3
       range_bot = RangeBot(servo_channel)
 
-      UPDATE_PERIOD = 2
+      UPDATE_PERIOD = .2
       MINIMUM_MANUEVER_RANGE = 28
-      MINIMUM_ROBOT_RANGE = 12
+      MINIMUM_ROBOT_RANGE = 20
 
       target_range = 0
       target_width = 0
