@@ -18,14 +18,14 @@ class Pro2():
         while self._running:
             command = input("Enter command: ")
             name = threading.currentThread().getName()
-            print ("Producer thread:  ", name)
+#            print ("Producer thread:  ", name)
 
             emptyString = ( len(command) == 0 )
             if ( emptyString ):
                 pass
             else:
                 _q.put(command)
-                print (command)
+#                print (command)
                 if command[0] == 'h' or command[0] == 'H':
                     _qQuit.put(command)
                     break

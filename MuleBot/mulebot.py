@@ -823,13 +823,13 @@ class MuleBot:
                             # get range to target
                             target_range = cmd[2:]
                             target_range = int(target_range)
-                            print("Target range: ", target_range)
+#                            print("Target range: ", target_range)
                             q_lidar_nav.put( 'r' + str(target_range) )
                         if cmd[1] == 'w':
                             # get width of target
                             target_width = cmd[2:]
                             target_width = int(target_width)
-                            print("Target width: ", target_width)
+#                            print("Target width: ", target_width)
                             q_lidar_nav.put( 'w' + str(target_width) )
                         
                     # end if
