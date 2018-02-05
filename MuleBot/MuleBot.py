@@ -397,7 +397,7 @@ class MuleBot:
     pwmDuration = 4095.0 * speedRPM_l / self.motorMaxRPM
 #    print("MuleBot.motorSpeed Duration left float: ", pwmDuration)
     pwmDuration = int( pwmDuration )
-    print("MuleBot.motorSpeed Duration left int: ", pwmDuration)
+#    print("MuleBot.motorSpeed Duration left int: ", pwmDuration)
     startOfPulse = 0
     self.pwm.setPWM(self.dcMotorLeftMotor, startOfPulse, pwmDuration)
     MuleBot.dcMotorPWMDurationLeft = pwmDuration
@@ -407,7 +407,7 @@ class MuleBot:
     pwmDuration = 4095.0 * speedRPM_r / self.motorMaxRPM
     pwmDuration = pwmDuration * 9727 / 10000  # 98.519113 percent
     pwmDuration = int( pwmDuration )
-    print("MuleBot.motorSpeed Duration right int: ", pwmDuration)
+#    print("MuleBot.motorSpeed Duration right int: ", pwmDuration)
     startOfPulse = 0
     self.pwm.setPWM(self.dcMotorRightMotor, startOfPulse, pwmDuration)
     MuleBot.dcMotorPWMDurationRight = pwmDuration
