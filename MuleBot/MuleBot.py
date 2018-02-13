@@ -15,6 +15,13 @@ import os
 import math
 
 import pdb
+import logging
+loggerMB = logging.getLogger(__name__)
+hdlr = logging.FileHandler('MuleBot.log')
+formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+hdlr.setFormatter(formatter)
+loggerMB.addHandler(hdlr) 
+loggerMB.setLevel(logging.ERROR)
 
 
 
@@ -105,7 +112,7 @@ class MuleBot:
     #count = 1
     self.pwm.setPWMFreq(1000)                        # Set frequency to 1000 Hz
 
-    self.tgt_min_range = 12
+    self.tgt_min_range = 28
 
 
   def terminate(self):
@@ -152,6 +159,30 @@ class MuleBot:
 
       rpm = rps * MuleBot.SECONDS_PER_MINUTE / MuleBot.RADIANS_IN_CIRCLE
       return rpm
+
+  def rpm_to_rps(self, rpm):
+      """rpm_to_rps transforms RPM to radians per second.
+
+      @type: float
+      @param: rpm
+
+      @rtype: float
+      @param: rps"""
+
+      rps = rpm / MuleBot.SECONDS_PER_MINUTE * MuleBot.RADIANS_IN_CIRCLE
+      return rps
+
+  def rpm_to_mps(self, rpm):
+      """rpm_to_mps transforms RPM to meters per second.
+
+      @type: float
+      @param: rpm
+
+      @rtype: float
+      @param: mps"""
+
+      mps = rpm / 60 * MuleBot.CIRCUM_M
+      return mps
 
 
 
@@ -229,6 +260,55 @@ class MuleBot:
 
       self.motorSpeed(rpm_l, rpm_r)
       return rpm_l, rpm_r
+
+  def u_turn(self):
+      rpm = 4
+      vel = self.rpm_to_mps(rpm)
+
+      # A u-turn = 180 degrees = 1 radian.
+      # Perform the u-turn in 10 seconds.
+      radian = 1
+      seconds = 10
+      omega = radian / seconds
+
+      v_l, v_r = self._uni_to_diff(vel, omega)
+
+      # Outside radius = 30
+      # Outside travel distance = 30 * pi
+      travel = 30 * 3.14159
+      travel_revolutions = travel / MuleBot.CIRCUM_IN
+
+      # minutes at 6 rpm
+      minutes = travel_revolutions / 6.0
+      seconds = minutes * 60.0
+
+#      pdb.set_trace()
+      v_l = self.rpm_to_rps(2)
+      v_r = self.rpm_to_rps(6)
+
+      rpm = self.rps_to_rpm(v_l)
+      print("2l:   rpm: ", rpm)
+      rpm = self.rps_to_rpm(v_r)
+      print("2r:   rpm: ", rpm)
+
+#      pdb.set_trace()
+      v_l, v_r, turn_duration = self.velocity_check(v_l, v_r)
+
+      rpm = self.rps_to_rpm(v_l)
+      print("3l:   rpm: ", rpm)
+      rpm = self.rps_to_rpm(v_r)
+      print("3r:   rpm: ", rpm)
+
+      # Set wheel drive rates.
+      self.set_wheel_drive_rates(v_l, v_r)
+
+      # Sleep during the turn.
+      time.sleep(seconds)
+
+      # Stop
+      v_l = 0
+      v_r = 0
+      self.set_wheel_drive_rates(v_l, v_r)
 
   def _uni_to_diff(self, v, omega):
 
@@ -720,13 +800,16 @@ class MuleBot:
       target_range = 0
       target_width = 0
 
+      loggerMB.info('lidarNav before while loop.')
       while self._running:
           v = self.v()
           rpm = self.rps_to_rpm( self.mps_to_rps(v)  )
 #          print("---1:   rpm: ", rpm)
 
+          loggerMB.info('lidarNav before lidarNav_queue_check.')
           target_range, target_width = \
               self.lidarNav_queue_check(q_lidar_nav, target_range, target_width)
+          loggerMB.info('lidarNav after lidarNav_queue_check.')
 
           v = self.v()
           rpm = self.rps_to_rpm( self.mps_to_rps(v)  )
@@ -734,15 +817,20 @@ class MuleBot:
 
           # Are we navigating?
           navigating = target_range > 0 and target_width > 0
+          loggerMB.debug('lidarNav navigating = {}.'.format(navigating))
 
           if navigating:
-              v = self.v()
+#              v = self.v()
 #              print("aMuleBot.lidarNav: v (m/s): ", v)
 #              print("bMuleBot.lidarNav: target_range: ", target_range)
 #              print("cMuleBot.lidarNav: target_width: ", target_width)
 
+              loggerMB.debug('lidarNav before execute_hunt.')
+              loggerMB.debug('lidarNav before execute_hunt. range: {}, width: {}'.format(target_range, target_width))
               angle, tgt_range, hits = \
                   range_bot.execute_hunt(target_range, target_width)
+              loggerMB.debug('lidarNav after execute_hunt.')
+
 #              v = self.v()
 #              print("dMuleBot.lidarNav: v (m/s): ", v)
 #              print("eMuleBot.lidarNav: angle (deg): ", angle)
@@ -750,8 +838,11 @@ class MuleBot:
 
               if True:
 
+                  loggerMB.debug('lidarNav before lidarNav_should_i_stay_or_should_i_go.')
                   target_range, angle_rad  = \
                       self.lidarNav_should_i_stay_or_should_i_go(tgt_range, angle)
+                  loggerMB.debug('lidarNav after lidarNav_should_i_stay_or_should_i_go.')
+
 #                  v = self.v()
 #                  print("gMuleBot.lidarNav: v (m/s): ", v)
 #                  print("hMuleBot.lidarNav: target_range: ", target_range)
@@ -764,12 +855,18 @@ class MuleBot:
                       # Only make turns if target >  inches away.
                       if target_range > MINIMUM_MANUEVER_RANGE:
                           # A turn is required.
+
+
+
+                          loggerMB.debug('lidarNav before lidarNav_turn.')
                           self.lidarNav_turn(angle_rad)
 
                   # end target range > 0
               # end if navigating
 
           time.sleep(UPDATE_PERIOD)
+
+      loggerMB.info('lidarNav after while loop.')
 
 
   def intFromStr( self, _string, _index ):

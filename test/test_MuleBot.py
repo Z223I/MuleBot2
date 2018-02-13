@@ -32,6 +32,9 @@ class TestMuleBot(unittest.TestCase):
     def tearDown(self):
         pass
 
+    def test_class_constants(self):
+        pass
+
     def test_class_variables(self):
         self.assertEqual(MuleBot.WHEEL_RADIUS, 2)
         self.assertEqual(MuleBot.WHEEL_BASE_LENGTH, 20)
@@ -104,7 +107,7 @@ class TestMuleBot(unittest.TestCase):
         check_vel_m = check_vel_m / MuleBot.SECONDS_PER_MINUTE
 
         check_vel_m = int(check_vel_m * 10000) / 10000
-        print("check_vel_m: ", check_vel_m)
+#        print("check_vel_m: ", check_vel_m)
 
         self.assertEqual(vel, check_vel_m)
 
@@ -168,21 +171,32 @@ class TestMuleBot(unittest.TestCase):
 
         2 radians = 1 rpm by definition."""
 
-        SECONDS_PER_MINUTES = 60
-        v_rps = 2.0 / SECONDS_PER_MINUTES
+        v_rps = 2.0 / MuleBot.SECONDS_PER_MINUTE
         v_rpm = self.test_mulebot.rps_to_rpm(v_rps)
 
         v_rpm_check = 1.0
         self.assertEqual(v_rpm, v_rpm_check)
 
+    def test_rpm_to_rps(self):
+        """test_rpm_to_rps
 
+        2 radians = 1 rpm by definition."""
 
+        rpm = 1.0
+        rps = self.test_mulebot.rpm_to_rps(rpm)
 
+        rps_check = 2 / MuleBot.SECONDS_PER_MINUTE
+        self.assertEqual(rps, rps_check)
 
+    def test_rpm_to_mps(self):
+        """test_rpm_to_mps test RPM to meter per second convsion.
+        1.0 RPM = Circum of the wheel in meters."""
 
+        rpm = 1.0
+        mps = self.test_mulebot.rpm_to_mps(rpm)
+        mpm = mps * MuleBot.SECONDS_PER_MINUTE
 
-
-
+        self.assertEqual(mpm, MuleBot.CIRCUM_M)
 
     def test_set_wheel_drive_rates_A(self):
         vel_l = TestMuleBot.MAX_VELOCITY_RADS_PER_SEC
