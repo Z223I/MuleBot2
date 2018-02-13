@@ -112,7 +112,7 @@ class MuleBot:
     #count = 1
     self.pwm.setPWMFreq(1000)                        # Set frequency to 1000 Hz
 
-    self.tgt_min_range = 28
+    self.tgt_min_range = 15
 
 
   def terminate(self):
@@ -795,7 +795,6 @@ class MuleBot:
 
       UPDATE_PERIOD = .2
       MINIMUM_MANUEVER_RANGE = 28
-      MINIMUM_ROBOT_RANGE = 20
 
       target_range = 0
       target_width = 0
