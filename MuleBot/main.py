@@ -1,6 +1,7 @@
 import threading
 import queue
 import time
+import os
 
 #from LidarLite3Ext import LidarLite3Ext
 from Pro2 import Pro2
@@ -11,6 +12,12 @@ from MuleBot import MuleBot as Con1
 
 #lidarLite3Ext = LidarLite3Ext()
 #lidarLite3Ext.init()
+
+# Delete existing log files.
+try:
+    os.remove("*.log")
+except:
+    pass
 
 pro2 = Pro2()
 #con1 = Con1()

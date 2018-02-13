@@ -21,7 +21,7 @@ hdlr = logging.FileHandler('MuleBot.log')
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
 loggerMB.addHandler(hdlr) 
-loggerMB.setLevel(logging.ERROR)
+loggerMB.setLevel(logging.WARNING)
 
 
 
