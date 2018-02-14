@@ -21,8 +21,8 @@ class TestAccessory(unittest.TestCase):
         pass
 
     def test___init__(self):
-        #self.assertEqual(self.testRangeBot.clip_distance, 6)
-        pass
+        self.assertEqual(self.testAccessory.time_on, 2)
+        self.assertEqual(self.testAccessory.time_off, 4)
 
     def test_water_pump(self):
         pass
