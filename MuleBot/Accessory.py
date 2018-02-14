@@ -8,3 +8,10 @@ class Accessory:
 
     def water_pump(self):
         pass
+        
+    def _w_p_init(self):
+        pass
+        
+    def _w_p_loop(self):
+        pass
+        
