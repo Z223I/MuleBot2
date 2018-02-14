@@ -25,13 +25,6 @@ loggerMB.setLevel(logging.WARNING)
 
 
 
-# TODO: set_wheel_drive_rates needs to be updated to deal with negative
-#       velocities.
-
-
-
-
-
 class MuleBot:
 
   """ Class MuleBot
