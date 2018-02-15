@@ -24,6 +24,7 @@ class Accessory:
         self._running = False
 
     def _init_relay(self):
+        """_init_relay initializes the relay."""
 
         self.relay4 = RelayPiPy()
 
@@ -46,8 +47,7 @@ class Accessory:
         @rtype: boolean
         @rparam: on """
         
-        # Set water pump to on.
-        # TODO: Control the relay.
+        # Set water pump to on/off.
         relay_no = 1
         
         if on:
@@ -61,7 +61,8 @@ class Accessory:
         pass
         
     def _w_p_loop(self):
-        """_w_p_loop cycles the water pump on and off."""
+        """_w_p_loop cycles the water pump on and off.  It is used in the
+        water_pump method."""
 
         on = True
         self._water_pump(on)
@@ -72,6 +73,7 @@ class Accessory:
         time.sleep(self.time_off)
     
     def water_pump(self):
+        """water_pump is the thread which controls the water pump."""
         self._w_p_init()
         
         while self.is_running():
