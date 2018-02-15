@@ -47,7 +47,8 @@ class TestAccessory(unittest.TestCase):
     def test__w_p_init(self):
         pass
         
-    def test__w_p_loop(self):
+    @patch('Accessory.time.sleep')
+    def test__w_p_loop(self, time):
         pass
         
         

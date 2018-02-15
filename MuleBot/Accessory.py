@@ -2,6 +2,8 @@
 
 #import threading
 
+import time
+
 class Accessory:
     """Accessory """
 
@@ -16,14 +18,12 @@ class Accessory:
     def is_running(self):
         return self._running
 
-    def x(self):
-        y = 2
-
     def _w_p_init(self):
         pass
         
     def _w_p_loop(self):
-        pass
+        time.sleep(self.time_on)
+        time.sleep(self.time_off)
     
     def water_pump(self):
         self._w_p_init()
