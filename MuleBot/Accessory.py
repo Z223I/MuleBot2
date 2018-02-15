@@ -1,21 +1,39 @@
 #/usr/bin/python
 
+import sys
+sys.path.append('/home/pi/pythondev/RelayPiPy/RelayPiPy')
+from RelayPiPy import RelayPiPy
+
 #import threading
 
 import time
+
 
 class Accessory:
     """Accessory """
 
     def __init__(self):
+        """__init__ initializes class variables."""
         self._running = True
         self.time_on = 2
         self.time_off = 4
 
     def terminate(self):
-        self._running = False
+        """terminate triggers the thread to stop."""
         
+        self._running = False
+
+    def _init_relay(self):
+
+        self.relay4 = RelayPiPy()
+
+        # init list with pin numbers
+        pinList = [6, 13, 19, 26]
+        self.relay4.init(pinList)
+            
     def is_running(self):
+        """is_running returns true if the thread is running, otherwise false"""
+        
         return self._running
     
     def _water_pump(self, on):
@@ -30,6 +48,13 @@ class Accessory:
         
         # Set water pump to on.
         # TODO: Control the relay.
+        relay_no = 1
+        
+        if on:
+            self.relay4.on(relay_no)
+        else:
+            self.relay4.off(relay_no)
+
         return on
 
     def _w_p_init(self):
