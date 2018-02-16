@@ -7,7 +7,7 @@ from RelayPiPy import RelayPiPy
 #import threading
 
 import time
-
+import queue
 
 class Accessory:
     """Accessory """
@@ -17,6 +17,7 @@ class Accessory:
         self._running = True
         self.time_on = 2
         self.time_off = 4
+        self.auto_water = False
 
     def terminate(self):
         """terminate triggers the thread to stop."""
@@ -71,6 +72,33 @@ class Accessory:
         on = False
         self._water_pump(on)
         time.sleep(self.time_off)
+        
+    def _w_p_queue_check(self, q_w_p):
+        """_w_p_queue_check processes commands from the water pump queue.
+        
+        @type: Queue
+        @param: q_w_p
+        
+        @rtype: boolean
+        @rparam: on"""
+        
+        # Looking for 'won' or 'woff'.
+        if not q_w_p.empty():
+            command = q_w_p.get()
+            command = command.lower()
+
+            if command == 'won':
+                 self.auto_water = True
+            elif command == 'woff':
+                 self.auto_water = False
+            else:
+                # Log the error
+                print('water_pump invalid command: {}'.format(command))
+                # Leave the auto_water attribute unchanged.
+
+        return self.auto_water
+
+        pass
     
     def water_pump(self):
         """water_pump is the thread which controls the water pump."""
