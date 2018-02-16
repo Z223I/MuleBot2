@@ -62,17 +62,20 @@ class Accessory:
         pass
         
     def _w_p_loop(self):
-        """_w_p_loop cycles the water pump on and off.  It is used in the
-        water_pump method."""
+        """_w_p_loop cycles the water pump on and off iff auto_water = True.  
+        It is used in the water_pump method."""
 
-        on = True
-        self._water_pump(on)
-        time.sleep(self.time_on)
+        if self.auto_water:
+            on = True
+            self._water_pump(on)
+            time.sleep(self.time_on)
         
-        on = False
-        self._water_pump(on)
-        time.sleep(self.time_off)
-        
+            on = False
+            self._water_pump(on)
+            time.sleep(self.time_off)
+        else:
+            time.sleep(1)
+            
     def _w_p_queue_check(self, q_w_p):
         """_w_p_queue_check processes commands from the water pump queue.
         

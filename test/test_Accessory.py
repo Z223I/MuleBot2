@@ -81,15 +81,32 @@ class TestAccessory(unittest.TestCase):
         
     def test__w_p_init(self):
         pass
-        
+
     @patch('Accessory.Accessory._water_pump')
     @patch('Accessory.time.sleep')
-    def test__w_p_loop(self, mock_time, mock__wp):
+    def test__w_p_loop_A(self, mock_time, mock__wp):
+        """test__w_p_loop_A tests the water pump loop when auto_water is true."""
+        
         mock__wp.side_effect = [True, False]
+        
+        self.testAccessory.auto_water = True
         self.testAccessory._w_p_loop()
 
         self.assertTrue(mock__wp.called)
         self.assertEqual(mock__wp.call_count, 2)
+
+    @patch('Accessory.Accessory._water_pump')
+    @patch('Accessory.time.sleep')
+    def test__w_p_loop_B(self, mock_time, mock__wp):
+        """test__w_p_loop_B tests the water pump loop when auto_water is false."""
+        
+        mock__wp.side_effect = [True, False]
+        
+        self.testAccessory.auto_water = False
+        self.testAccessory._w_p_loop()
+
+        self.assertFalse(mock__wp.called)
+        self.assertEqual(mock_time.call_count, 1)
         
         
 #    def test_set_clip_distance(self):
