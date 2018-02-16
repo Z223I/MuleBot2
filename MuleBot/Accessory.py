@@ -61,10 +61,13 @@ class Accessory:
     def _w_p_init(self):
         pass
         
-    def _w_p_loop(self):
+    def _w_p_loop(self, q_w_p):
         """_w_p_loop cycles the water pump on and off iff auto_water = True.  
         It is used in the water_pump method."""
 
+        # Process any commands from the queue.
+        self._w_p_queue_check(q_w_p)
+        
         if self.auto_water:
             on = True
             self._water_pump(on)
@@ -100,12 +103,10 @@ class Accessory:
                 # Leave the auto_water attribute unchanged.
 
         return self.auto_water
-
-        pass
     
-    def water_pump(self):
+    def water_pump(self, q_w_p):
         """water_pump is the thread which controls the water pump."""
         self._w_p_init()
         
         while self.is_running():
-            self._w_p_loop()
+            self._w_p_loop(q_w_p)

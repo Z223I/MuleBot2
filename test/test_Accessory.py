@@ -74,7 +74,9 @@ class TestAccessory(unittest.TestCase):
     def test_water_pump(self, mock__w_p_init, mock__w_p_loop, mock_is_running):
         mock_is_running.side_effect = [True, False]
         
-        self.testAccessory.water_pump()
+        # The q isn't being used during the test.
+        q = None
+        self.testAccessory.water_pump(q)
         self.assertTrue(mock__w_p_init.called)
         self.assertTrue(mock__w_p_loop.called)
         self.assertTrue(mock_is_running.called)
@@ -82,28 +84,36 @@ class TestAccessory(unittest.TestCase):
     def test__w_p_init(self):
         pass
 
+    @patch('Accessory.Accessory._w_p_queue_check')
     @patch('Accessory.Accessory._water_pump')
     @patch('Accessory.time.sleep')
-    def test__w_p_loop_A(self, mock_time, mock__wp):
+    def test__w_p_loop_A(self, mock_time, mock__wp, mock_queue_check):
         """test__w_p_loop_A tests the water pump loop when auto_water is true."""
         
         mock__wp.side_effect = [True, False]
         
         self.testAccessory.auto_water = True
-        self.testAccessory._w_p_loop()
+        
+        # The q isn't being used in the test.  It's use is mocked.
+        q = None
+        self.testAccessory._w_p_loop(q)
 
         self.assertTrue(mock__wp.called)
         self.assertEqual(mock__wp.call_count, 2)
 
+    @patch('Accessory.Accessory._w_p_queue_check')
     @patch('Accessory.Accessory._water_pump')
     @patch('Accessory.time.sleep')
-    def test__w_p_loop_B(self, mock_time, mock__wp):
+    def test__w_p_loop_B(self, mock_time, mock__wp, mock_queue_check):
         """test__w_p_loop_B tests the water pump loop when auto_water is false."""
         
         mock__wp.side_effect = [True, False]
         
         self.testAccessory.auto_water = False
-        self.testAccessory._w_p_loop()
+
+        # The q isn't being used in the test.  It's use is mocked.
+        q = None
+        self.testAccessory._w_p_loop(q)
 
         self.assertFalse(mock__wp.called)
         self.assertEqual(mock_time.call_count, 1)
