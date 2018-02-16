@@ -21,12 +21,19 @@ class TestAccessory(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test___init__(self):
+    @patch('Accessory.Accessory._init_relay')
+    def test___init__(self, mock__init_relay):
         self.assertTrue(self.testAccessory._running)
         self.assertEqual(self.testAccessory.time_on, 2)
         self.assertEqual(self.testAccessory.time_off, 4)
         self.assertFalse(self.testAccessory.auto_water)
+        self.assertTrue(mock__init_relay.called)
 
+    @patch('Accessory.RelayPiPy.init')
+    def test_init_relay(self, mock_relay_init):
+        self.testAccessory._init_relay()
+        self.assertTrue(mock_relay_init.called)
+        
     def test_terminate(self):
         self.testAccessory.terminate()
         self.assertFalse(self.testAccessory._running)
@@ -35,6 +42,20 @@ class TestAccessory(unittest.TestCase):
         running = self.testAccessory.is_running()
         self.assertTrue(running)
 
+    @patch('Accessory.RelayPiPy.on')
+    def test__water_pump_A(self, mock_on):
+        on = True
+        is_on = self.testAccessory._water_pump(on)
+        self.assertTrue(is_on)
+        self.assertTrue(mock_on.called)
+
+    @patch('Accessory.RelayPiPy.off')
+    def test__water_pump_B(self, mock_off):
+        on = False
+        is_on = self.testAccessory._water_pump(on)
+        self.assertFalse(is_on)
+        self.assertTrue(mock_off.called)
+    
     def test__w_p_queue_check_A(self):
         """test__w_p_queue_check_A checks the water on command, a.k.a. 'won'
         to verify it is working."""

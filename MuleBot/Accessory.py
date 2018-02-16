@@ -8,6 +8,8 @@ from RelayPiPy import RelayPiPy
 
 import time
 import queue
+import pdb
+
 
 class Accessory:
     """Accessory """
@@ -18,6 +20,7 @@ class Accessory:
         self.time_on = 2
         self.time_off = 4
         self.auto_water = False
+        self._init_relay()
 
     def terminate(self):
         """terminate triggers the thread to stop."""
@@ -106,6 +109,7 @@ class Accessory:
     
     def water_pump(self, q_w_p):
         """water_pump is the thread which controls the water pump."""
+        # pdb.set_trace()
         self._w_p_init()
         
         while self.is_running():

@@ -867,7 +867,7 @@ class MuleBot:
       list = re.findall( r'\d+', _string )
       return int( list[_index] )
 
-  def run2(self, _q2, _qWallDistance, q_lidar_nav):
+  def run2(self, _q2, _qWallDistance, q_lidar_nav, q_water_pump):
         """ run2 is a thread
         It is processing commands from the keyboard
         _q2 is a command queue
@@ -905,6 +905,8 @@ class MuleBot:
                   self.dcMotorRightTurn( count  )
                 elif command == 't':
                   self.test()
+                elif command == 'w':
+                  q_water_pump.put(cmd)
                 # n is for navigating using Lidar.
                 elif command == 'n':
                     if len(cmd) >= 3:
