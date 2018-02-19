@@ -21,7 +21,7 @@ hdlr = logging.FileHandler('MuleBot.log')
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
 loggerMB.addHandler(hdlr) 
-loggerMB.setLevel(logging.WARNING)
+loggerMB.setLevel(logging.DEBUG)
 
 
 
@@ -61,9 +61,9 @@ class MuleBot:
     self.distanceToWall = 0
 
 
-    self.pwmEnablePin       = 16 # Broadcom pin 16
-    self.motor1DirectionPin = 20 # Broadcom pin 20
-    self.motor2DirectionPin = 21 # Broadcom pin 21
+    self.pwmEnablePin       = 23 # Broadcom pin 23 was 16
+    self.motor1DirectionPin = 24 # Broadcom pin 24 was 20
+    self.motor2DirectionPin = 25 # Broadcom pin 25 was 21
 
     self.motorForward = GPIO.HIGH
     self.motorReverse = GPIO.LOW
