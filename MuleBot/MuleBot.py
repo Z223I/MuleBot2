@@ -61,9 +61,9 @@ class MuleBot:
     self.distanceToWall = 0
 
 
-    self.pwmEnablePin       = 16 # Broadcom pin 16
-    self.motor1DirectionPin = 20 # Broadcom pin 20
-    self.motor2DirectionPin = 21 # Broadcom pin 21
+    self.pwmEnablePin       = 23 # Broadcom pin 23 was 16
+    self.motor1DirectionPin = 24 # Broadcom pin 24 was 20
+    self.motor2DirectionPin = 25 # Broadcom pin 25 was 21
 
     self.motorForward = GPIO.HIGH
     self.motorReverse = GPIO.LOW
@@ -772,7 +772,7 @@ class MuleBot:
 
 
 
-  def lidarNav(self, _q2, q_lidar_nav):
+  def lidarNav(self, _q2, q_lidar_nav, q_water_pump):
 
       """lidarNav is used to navigate the MuleBot to
       an object.
@@ -791,6 +791,9 @@ class MuleBot:
 
       target_range = 0
       target_width = 0
+    
+      navigating = False
+      was_navigating = False
 
       loggerMB.info('lidarNav before while loop.')
       while self._running:
@@ -811,6 +814,12 @@ class MuleBot:
           navigating = target_range > 0 and target_width > 0
           loggerMB.debug('lidarNav navigating = {}.'.format(navigating))
 
+          if navigating and not was_navigating:
+              # We weren't navigating and now we are.
+              # Turn on water pump
+              q_water_pump.put('won')
+              was_navigating = True
+            
           if navigating:
 #              v = self.v()
 #              print("aMuleBot.lidarNav: v (m/s): ", v)
@@ -835,6 +844,10 @@ class MuleBot:
                       self.lidarNav_should_i_stay_or_should_i_go(tgt_range, angle)
                   loggerMB.debug('lidarNav after lidarNav_should_i_stay_or_should_i_go.')
 
+                  if target_range == 0:
+                      q_water_pump.put('woff')
+                      navigating = False
+                      was_navigating = False
 #                  v = self.v()
 #                  print("gMuleBot.lidarNav: v (m/s): ", v)
 #                  print("hMuleBot.lidarNav: target_range: ", target_range)

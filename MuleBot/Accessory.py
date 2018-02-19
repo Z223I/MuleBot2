@@ -52,7 +52,7 @@ class Accessory:
         @rparam: on """
         
         # Set water pump to on/off.
-        relay_no = 1
+        relay_no = 0
         
         if on:
             self.relay4.on(relay_no)
@@ -80,7 +80,7 @@ class Accessory:
             self._water_pump(on)
             time.sleep(self.time_off)
         else:
-            time.sleep(1)
+            time.sleep(.1)
             
     def _w_p_queue_check(self, q_w_p):
         """_w_p_queue_check processes commands from the water pump queue.
@@ -114,3 +114,16 @@ class Accessory:
         
         while self.is_running():
             self._w_p_loop(q_w_p)
+
+if __name__ == '__main__':
+    accessory = Accessory()
+    
+    accessory._water_pump(True)
+    print("Water Pump: ON")
+    time.sleep(3)
+    
+    accessory._water_pump(False)
+    print("Water Pump: off")
+    time.sleep(1)
+
+    print("Bye!")
