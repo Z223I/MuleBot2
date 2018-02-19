@@ -42,7 +42,7 @@ pro2Thread  = threading.Thread(target=pro2.run, args=(qCommands, qQuit, ))
 con2Thread2 = threading.Thread(target=con2.run2, args= \
     (qCommands, qWallDistance, q_lidar_nav, q_water_pump))
 stateLocationThread = threading.Thread(target=stateLocation.laserNav, args=(qCommands, ))
-lidarNavThread = threading.Thread(target=lidar_Nav.lidarNav, args=(qCommands, q_lidar_nav))
+lidarNavThread = threading.Thread(target=lidar_Nav.lidarNav, args=(qCommands, q_lidar_nav, q_water_pump))
 w_p_Thread = threading.Thread(target=water_pump.water_pump, args=(q_water_pump,))
 
 #lidarLite3ExtThread.start()

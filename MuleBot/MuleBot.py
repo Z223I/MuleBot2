@@ -772,7 +772,7 @@ class MuleBot:
 
 
 
-  def lidarNav(self, _q2, q_lidar_nav):
+  def lidarNav(self, _q2, q_lidar_nav, q_water_pump):
 
       """lidarNav is used to navigate the MuleBot to
       an object.
@@ -791,6 +791,9 @@ class MuleBot:
 
       target_range = 0
       target_width = 0
+    
+      navigating = False
+      was_navigating = False
 
       loggerMB.info('lidarNav before while loop.')
       while self._running:
@@ -811,6 +814,10 @@ class MuleBot:
           navigating = target_range > 0 and target_width > 0
           loggerMB.debug('lidarNav navigating = {}.'.format(navigating))
 
+          if navigating and not was_navigating:
+            q_water_pump.put('won')
+            was_navigating = True
+            
           if navigating:
 #              v = self.v()
 #              print("aMuleBot.lidarNav: v (m/s): ", v)
@@ -841,6 +848,11 @@ class MuleBot:
 #                  print("iMuleBot.lidarNav: angle_rad: ", angle_rad)
 #                  input("Press [Enter] to continue.")
 
+                  if target_range == 0:
+                      q_water_pump.put('woff')
+                      navigating = False
+                      was_navigating = False
+                    
                   # Is a turn required?
                   if target_range > 0 and not (angle_rad == 0):
 
