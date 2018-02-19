@@ -326,6 +326,7 @@ class MuleBot:
     @return: v_r velocity right wheel (rads/s)"""
 
 #    print("--MuleBot._uni_to_diff({:.3f}, {:.3f})".format(v, omega))
+    loggerMB.debug("--MuleBot._uni_to_diff({:.3f}, {:.3f})".format(v, omega))
 
     # v = translation velocity (m/s)
     # omega = angular velocity (rad/s)
@@ -349,10 +350,12 @@ class MuleBot:
     # All measurements are now metric.
     v_l = ( (2.0 * v) - (omega * Lm) ) / (2.0 * R)
     v_r = ( (2.0 * v) + (omega * Lm) ) / (2.0 * R)
+    loggerMB.debug("--MuleBot._uni_to_diff v_l, v_r: {:.3f}, {:.3f}".format(v_l, v_r))
 
     rpm_l = self.rps_to_rpm(v_l)
     rpm_r = self.rps_to_rpm(v_r)
 #    print("--MuleBot._uni_to_diff rpm_l, rpm_r: {:.3f}, {:.3f}".format(rpm_l, rpm_r))
+    loggerMB.debug("--MuleBot._uni_to_diff rpm_l, rpm_r: {:.3f}, {:.3f}".format(rpm_l, rpm_r))
 
     return v_l, v_r
 
