@@ -5,4 +5,4 @@ from MuleBot import MuleBot
 bot = MuleBot()
 
 
-bot.u_turn('left', 20)
+bot.u_turn('right', 10)

@@ -228,10 +228,17 @@ class TestMuleBot(unittest.TestCase):
         self.assertEqual(rpm_l, 3.0)
         self.assertEqual(rpm_r, 3.0)
 
+    def test_forward(self):
+        pass
+
+    def test_stop(self):
+        pass
+        
+    @patch('MuleBot.MuleBot.forward')
     @patch('MuleBot.MuleBot.stop')
     @patch('MuleBot.MuleBot.set_wheel_drive_rates')
     @patch('MuleBot.time.sleep')
-    def test_u_turn_A(self, mock_time, mock_wheel, mock_stop):
+    def test_u_turn_A(self, mock_time, mock_wheel, mock_stop, mock_forward):
         """test_u_turn_A tests the case where the inside radius is 10 and
         the outside radius is 30.  This gives a speed ratio of 3.  So the
         inside wheel speed should be 1/3 of the outside wheel speed."""

@@ -254,6 +254,21 @@ class MuleBot:
       self.motorSpeed(rpm_l, rpm_r)
       return rpm_l, rpm_r
 
+  def forward(self, inches):
+        revolutions = inches / MuleBot.CIRCUM_IN
+        
+        rpm = MuleBot.MAX_RPM
+        
+        minutes = revolutions / rpm
+        
+        seconds = minutes * MuleBot.SECONDS_PER_MINUTE
+        
+        v = self.rpm_to_rps(rpm)
+        self.set_wheel_drive_rates(v, v)
+        
+        time.sleep(seconds)
+        self.stop()
+        
   def stop(self):
         v_l = 0
         v_r = 0
@@ -294,6 +309,18 @@ class MuleBot:
         # minutes at outside_rpm
         minutes = travel_revolutions / outside_rpm
         seconds = minutes * MuleBot.SECONDS_PER_MINUTE
+        
+        # Something isn't quite perfect.
+        if direction == 'left':
+            if diameter_in < 25:
+                seconds -= 1
+            else:
+                seconds -= 2
+        else:
+            if diameter_in < 25:
+                seconds += 1
+            else:
+                seconds += 2
 
         if direction == 'left':
             v_l = self.rpm_to_rps(inside_rpm)
@@ -316,6 +343,9 @@ class MuleBot:
 
         # Stop
         self.stop()
+        
+        # Move forward 24 inches.
+        self.forward(24)
 
   def _uni_to_diff(self, v, omega):
 
