@@ -7,7 +7,8 @@ except ImportError:
 #import sys
 
 import unittest
-#import time
+from unittest.mock import patch
+
 import queue
 import math
 
@@ -138,9 +139,9 @@ class TestMuleBot(unittest.TestCase):
     def test___init___(self):
         self.assertEqual(self.test_mulebot._running, True)
         self.assertEqual(self.test_mulebot.distanceToWall, 0)
-        self.assertEqual(self.test_mulebot.pwmEnablePin, 16)
-        self.assertEqual(self.test_mulebot.motor1DirectionPin, 20)
-        self.assertEqual(self.test_mulebot.motor2DirectionPin, 21)
+        self.assertEqual(self.test_mulebot.pwmEnablePin, 23)
+        self.assertEqual(self.test_mulebot.motor1DirectionPin, 24)
+        self.assertEqual(self.test_mulebot.motor2DirectionPin, 25)
 
         self.assertEqual(self.test_mulebot.motorForward, GPIO.HIGH)
         self.assertEqual(self.test_mulebot.motorReverse, GPIO.LOW)
@@ -226,6 +227,41 @@ class TestMuleBot(unittest.TestCase):
 
         self.assertEqual(rpm_l, 3.0)
         self.assertEqual(rpm_r, 3.0)
+
+    @patch('MuleBot.MuleBot.stop')
+    @patch('MuleBot.MuleBot.set_wheel_drive_rates')
+    @patch('MuleBot.time.sleep')
+    def test_u_turn_A(self, mock_time, mock_wheel, mock_stop):
+        """test_u_turn_A tests the case where the inside radius is 10 and
+        the outside radius is 30.  This gives a speed ratio of 3.  So the
+        inside wheel speed should be 1/3 of the outside wheel speed."""
+        
+        direction = 'left'
+        diameter_inches = 20
+        self.test_mulebot.u_turn(direction, diameter_inches)
+        
+        v_l_check = MuleBot.MAX_RPS / 3
+        v_r_check = MuleBot.MAX_RPS
+        mock_wheel.assert_any_call(v_l_check, v_r_check)
+        mock_wheel.assert_is_called_once
+
+
+    @patch('MuleBot.MuleBot.stop')
+    @patch('MuleBot.MuleBot.set_wheel_drive_rates')
+    @patch('MuleBot.time.sleep')
+    def test_u_turn_B(self, mock_time, mock_wheel, mock_stop):
+        """test_u_turn_A tests the case where the inside radius is 20 and
+        the outside radius is 40.  This gives a speed ratio of 2.  So the
+        inside wheel speed should be 1/3 of the outside wheel speed."""
+        
+        direction = 'left'
+        diameter_inches = 40
+        self.test_mulebot.u_turn(direction, diameter_inches)
+        
+        v_l_check = MuleBot.MAX_RPS / 2
+        v_r_check = MuleBot.MAX_RPS
+        mock_wheel.assert_any_call(v_l_check, v_r_check)
+        mock_wheel.assert_is_called_once
 
     def test__uni_to_diff_A(self):
         v = TestMuleBot.MAX_VELOCITY_METERS_PER_SEC
