@@ -254,54 +254,55 @@ class MuleBot:
       self.motorSpeed(rpm_l, rpm_r)
       return rpm_l, rpm_r
 
-  def u_turn(self):
-      rpm = 4
-      vel = self.rpm_to_mps(rpm)
+  def u_turn(self, diameter_in):
+    
+        # Calculate radius of turn for the inside wheel.
+        r_in = diameter_in / 2
+        
+        rpm = 4
+        vel = self.rpm_to_mps(rpm)
 
-      # A u-turn = 180 degrees = 1 radian.
-      # Perform the u-turn in 10 seconds.
-      radian = 1
-      seconds = 10
-      omega = radian / seconds
+        # Outside radius = 30
+        if r_in < 0:
+            r_out = r_in - MuleBot.WHEEL_BASE_LENGTH
+        else:
+            r_out = r_in + MuleBot.WHEEL_BASE_LENGTH
+        
+        # Outside travel distance
+        travel = r_out * 3.14159
+        travel_revolutions = travel / MuleBot.CIRCUM_IN
 
-      v_l, v_r = self._uni_to_diff(vel, omega)
+        # minutes at 6 rpm
+        minutes = travel_revolutions / 6.0
+        seconds = minutes * MuleBot.SECONDS_PER_MINUTE
 
-      # Outside radius = 30
-      # Outside travel distance = 30 * pi
-      travel = 30 * 3.14159
-      travel_revolutions = travel / MuleBot.CIRCUM_IN
+#        pdb.set_trace()
+        v_l = self.rpm_to_rps(2)
+        v_r = self.rpm_to_rps(6)
 
-      # minutes at 6 rpm
-      minutes = travel_revolutions / 6.0
-      seconds = minutes * 60.0
+        rpm = self.rps_to_rpm(v_l)
+        print("2l:   rpm: ", rpm)
+        rpm = self.rps_to_rpm(v_r)
+        print("2r:   rpm: ", rpm)
 
-#      pdb.set_trace()
-      v_l = self.rpm_to_rps(2)
-      v_r = self.rpm_to_rps(6)
+#        pdb.set_trace()
+        v_l, v_r, turn_duration = self.velocity_check(v_l, v_r)
 
-      rpm = self.rps_to_rpm(v_l)
-      print("2l:   rpm: ", rpm)
-      rpm = self.rps_to_rpm(v_r)
-      print("2r:   rpm: ", rpm)
+        rpm = self.rps_to_rpm(v_l)
+        print("3l:   rpm: ", rpm)
+        rpm = self.rps_to_rpm(v_r)
+        print("3r:   rpm: ", rpm)
 
-#      pdb.set_trace()
-      v_l, v_r, turn_duration = self.velocity_check(v_l, v_r)
+        # Set wheel drive rates.
+        self.set_wheel_drive_rates(v_l, v_r)
 
-      rpm = self.rps_to_rpm(v_l)
-      print("3l:   rpm: ", rpm)
-      rpm = self.rps_to_rpm(v_r)
-      print("3r:   rpm: ", rpm)
+        # Sleep during the turn.
+        time.sleep(seconds)
 
-      # Set wheel drive rates.
-      self.set_wheel_drive_rates(v_l, v_r)
-
-      # Sleep during the turn.
-      time.sleep(seconds)
-
-      # Stop
-      v_l = 0
-      v_r = 0
-      self.set_wheel_drive_rates(v_l, v_r)
+        # Stop
+        v_l = 0
+        v_r = 0
+        self.set_wheel_drive_rates(v_l, v_r)
 
   def _uni_to_diff(self, v, omega):
 
