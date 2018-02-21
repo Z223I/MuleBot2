@@ -270,6 +270,9 @@ class TestMuleBot(unittest.TestCase):
         mock_wheel.assert_any_call(v_l_check, v_r_check)
         mock_wheel.assert_is_called_once
 
+    def test_u_turn_supervisor_A(self):
+        pass
+        
     def test__uni_to_diff_A(self):
         v = TestMuleBot.MAX_VELOCITY_METERS_PER_SEC
         omega = 0.0

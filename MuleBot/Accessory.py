@@ -35,6 +35,9 @@ class Accessory:
         # init list with pin numbers
         pinList = [6, 13, 19, 26]
         self.relay4.init(pinList)
+        
+        for i in range(len(pinList)):
+            self.relay4.off(i)
             
     def is_running(self):
         """is_running returns true if the thread is running, otherwise false"""

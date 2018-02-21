@@ -347,6 +347,12 @@ class MuleBot:
         # Move forward 24 inches.
         self.forward(24)
 
+  def u_turn_supervisor(self, command):
+    
+        # strip the initial 'u'
+        command = command[1:]
+        pass
+
   def _uni_to_diff(self, v, omega):
 
     """ _uni_to_diff The is a "unicycle model".  It performs a unicycle to 
@@ -964,6 +970,9 @@ class MuleBot:
                   self.dcMotorRightTurn( count  )
                 elif command == 't':
                   self.test()
+                elif command == 'u':
+                  # U-turn command
+                  self.u_turn_supervisor(cmd)
                 elif command == 'w':
                   q_water_pump.put(cmd)
                 # n is for navigating using Lidar.
