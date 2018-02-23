@@ -348,10 +348,30 @@ class MuleBot:
         self.forward(24)
 
   def u_turn_supervisor(self, command):
+        __doc__ = """u_turn_supervisor parses u_turn commands and then 
+        calls u_turn.
+        
+        Examples: 'ul10' makes a left-handed u_turn with a 10" diameter.
+                   'ur40' makes a right-handed u_turn with a 40" diameter.
+                        
+        @type: string
+        @param: command"""
     
         # strip the initial 'u'
         command = command[1:]
-        pass
+        if len(command) > 0:
+            if command[0] == 'l':
+                direction = 'left'
+            else:
+                direction = 'right'
+                
+        # strip the direction
+        command = command[1:]
+
+        if len(command) > 0:
+            diameter = int(command)
+            self.u_turn(direction, diameter)
+                            
 
   def _uni_to_diff(self, v, omega):
 

@@ -270,8 +270,25 @@ class TestMuleBot(unittest.TestCase):
         mock_wheel.assert_any_call(v_l_check, v_r_check)
         mock_wheel.assert_is_called_once
 
-    def test_u_turn_supervisor_A(self):
-        pass
+    @patch('MuleBot.MuleBot.u_turn')
+    def test_u_turn_supervisor_A(self, mock_u_turn):
+        """test_u_turn_supervisor_A tests a left-handed u-turn."""
+        
+        command = 'ul10'
+        self.test_mulebot.u_turn_supervisor(command)
+
+        mock_u_turn.assert_any_call('left', 10)        
+        mock_u_turn.assert_is_called_once
+
+    @patch('MuleBot.MuleBot.u_turn')
+    def test_u_turn_supervisor_B(self, mock_u_turn):
+        """test_u_turn_supervisor_B tests a right-handed u-turn."""
+        
+        command = 'ur10'
+        self.test_mulebot.u_turn_supervisor(command)
+
+        mock_u_turn.assert_any_call('right', 10)        
+        mock_u_turn.assert_is_called_once
         
     def test__uni_to_diff_A(self):
         v = TestMuleBot.MAX_VELOCITY_METERS_PER_SEC
