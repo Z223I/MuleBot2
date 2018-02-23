@@ -50,7 +50,9 @@ class MuleBot:
 
 
   def __init__(self):
-    """__init__"""
+    """
+    __init__ initializes class variables.
+    """
 
     global GPIO
 
@@ -109,25 +111,28 @@ class MuleBot:
 
 
   def terminate(self):
-    """terminate"""
+    """terminate is for stopping the thread."""
     self._running = False
 
 
 
   def mps_to_rps(self, mps):
-      """mps_to_rps transforms meters per second to radians per second.
+      """
+      mps_to_rps transforms meters per second to radians per second.
 
       @type: float
       @param: mps (meters per second)
 
       @rtype: float
-      @param: rps (radians per second)"""
+      @param: rps (radians per second)
+      """
 
       rps = mps * 2 / MuleBot.CIRCUM_M
       return rps
 
   def rps_to_mps(self, rps):
-      """rps_to_mps transforms radians per second to meters per second.
+      """
+      rps_to_mps transforms radians per second to meters per second.
 
       If rps = 2.0, then mps should equal MuleBot.CIRCUM_M because there are
       2.0 radians in a circle.
@@ -136,43 +141,50 @@ class MuleBot:
       @param: rps (radians per second)
 
       @rtype: float
-      @param: mps (meters per second)"""
+      @param: mps (meters per second)
+      """
 
       mps = rps * MuleBot.CIRCUM_M / 2
       return mps
 
   def rps_to_rpm(self, rps):
-      """rps_to_rpm transforms radians per second to RPM.
+      """
+      rps_to_rpm transforms radians per second to RPM.
 
       @type: float
       @param: rps (radians per second)
 
       @rtype: float
-      @param: rpm"""
+      @param: rpm
+      """
 
       rpm = rps * MuleBot.SECONDS_PER_MINUTE / MuleBot.RADIANS_IN_CIRCLE
       return rpm
 
   def rpm_to_rps(self, rpm):
-      """rpm_to_rps transforms RPM to radians per second.
+      """
+      rpm_to_rps transforms RPM to radians per second.
 
       @type: float
       @param: rpm
 
       @rtype: float
-      @param: rps"""
+      @param: rps
+      """
 
       rps = rpm / MuleBot.SECONDS_PER_MINUTE * MuleBot.RADIANS_IN_CIRCLE
       return rps
 
   def rpm_to_mps(self, rpm):
-      """rpm_to_mps transforms RPM to meters per second.
+      """
+      rpm_to_mps transforms RPM to meters per second.
 
       @type: float
       @param: rpm
 
       @rtype: float
-      @param: mps"""
+      @param: mps
+      """
 
       mps = rpm / 60 * MuleBot.CIRCUM_M
       return mps
@@ -375,7 +387,8 @@ class MuleBot:
 
   def _uni_to_diff(self, v, omega):
 
-    """ _uni_to_diff The is a "unicycle model".  It performs a unicycle to 
+    """
+    _uni_to_diff The is a "unicycle model".  It performs a unicycle to 
     "differential drive model" mathematical translation.
 
     NB: The input/output variable are in DIFFERENT units!  This is because
@@ -393,7 +406,8 @@ class MuleBot:
     @return: v_l velocity left wheel (rads/s)
 
     @rtype: float
-    @return: v_r velocity right wheel (rads/s)"""
+    @return: v_r velocity right wheel (rads/s)
+    """
 
 #    print("--MuleBot._uni_to_diff({:.3f}, {:.3f})".format(v, omega))
     loggerMB.debug("--MuleBot._uni_to_diff({:.3f}, {:.3f})".format(v, omega))
@@ -430,14 +444,29 @@ class MuleBot:
     return v_l, v_r
 
   def motorDirection(self, motorPin, direction):
-    """motorDirection"""
+    """
+    motorDirection sets the direction of a single motor.
+    
+    Keyword arguments:
+    motorPin -- Integer representing the direction pin for a specific motor.
+    
+    direction -- Single bit representing fowards or backwards.
+    
+    Usage:
+        self.motorDirection(self.motor1DirectionPin, self.motorReverse)
+    """
     #  print "motorPin: ", motorPin
     #  print "direction: ",  direction
     GPIO.output(motorPin, direction)
 
 
   def motorsDirection(self, direction):
-    """motorsDirection"""
+    """
+    motorsDirection sets the direction of both motors to the same direction.
+    
+    Keyword arguments:
+    direction -- single character
+    """
 
     print (direction)
     if direction == 'r' or direction == 'R':

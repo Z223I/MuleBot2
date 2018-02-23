@@ -88,7 +88,7 @@ qWallDistance.join()
 print ("joined 4 queue(s)")
 q_lidar_nav.join()
 print ("joined 5 queue(s)")
-water_pump.join()
+q_water_pump.join()
 print ("joined 6 queue(s)")
 
 print ("Bye!")
