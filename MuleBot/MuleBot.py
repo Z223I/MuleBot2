@@ -1095,7 +1095,7 @@ class MuleBot:
         time.sleep(2)
 
 
-                
+
 
   def laserNav( self, _qCommands ):
 
@@ -1116,7 +1116,7 @@ class MuleBot:
           if not (lastCommandChangeTime == None):
               if not (lastCommand == None):
                   # There is a time and command.
-              
+
                   # Check if at least 30 seconds have passed since 
                   # last state change.
                   TIME_TO_WAIT = 30   # Seconds
@@ -1128,8 +1128,8 @@ class MuleBot:
 
 
 
-          files = os.listdir("/home/pi/pythondev/MuleBot2/")
-          
+          files = os.listdir("/home/pi/p/MuleBot2/")
+
           for file in files:
               # Looking for files ending in ".loc"
               if file.endswith(".loc"):
@@ -1276,21 +1276,3 @@ def test():
   totalDeltaTime = finishTime - startTime
   singleDeltaTime = totalDeltaTime / maxEvents
   print (singleDeltaTime, " * ", maxEvents, " = ", totalDeltaTime)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
