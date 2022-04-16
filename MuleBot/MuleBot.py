@@ -3,7 +3,7 @@
 from Adafruit_PWM_Servo_Driver import PWM
 import sys
 sys.path.append("/home/pi/pythondev/RangeBot/RangeBot")
-from RangeBot import RangeBot
+#from RangeBot import RangeBot
 
 import time
 
@@ -1128,7 +1128,7 @@ class MuleBot:
 
 
 
-          files = os.listdir("/home/pi/p/MuleBot2/")
+          files = os.listdir(".")
 
           for file in files:
               # Looking for files ending in ".loc"
@@ -1223,7 +1223,6 @@ def myInt(channel):
     if interruptLeftCount > 0:
       elapsedTime = now - startTimeLeft
     print ("Left ", channel, now, interruptLeftCount, elapsedTime)
-
 
   if channel == laserDetectRightPin:
     interruptRightCount += 1

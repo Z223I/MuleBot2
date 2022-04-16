@@ -40,7 +40,19 @@ class Adafruit_I2C(object):
     # Alternatively, you can hard-code the bus version below:
     # self.bus = smbus.SMBus(0); # Force I2C0 (early 256MB Pi's)
     # self.bus = smbus.SMBus(1); # Force I2C1 (512MB Pi's)
-    self.bus = smbus.SMBus(busnum if busnum >= 0 else Adafruit_I2C.getPiI2CBusNumber())
+
+    # Pi Start Menu -> Preferences -> Raspberry Pi Configuration
+    # In the pop-up window, click on the ‘Interfaces’ tab and select the ‘Enable’ radio button for I2C.
+    # Reboot
+    # Reference: https://www.engineersgarage.com/articles-raspberry-pi-i2c-bus-pins-smbus-smbus2-python/
+    print(f"busnum: {busnum}")
+    i2cBusNumber = Adafruit_I2C.getPiI2CBusNumber()
+    print(f"i2cBusNumber: {i2cBusNumber}")
+
+    newbusnum = busnum if busnum >= 0 else Adafruit_I2C.getPiI2CBusNumber()
+    print(f"newbusnum: {newbusnum}")
+
+    self.bus = smbus.SMBus(newbusnum)
     self.debug = debug
 
   def reverseByteOrder(self, data):

@@ -20,7 +20,7 @@ class Accessory:
         self.time_on = 2
         self.time_off = 4
         self.auto_water = False
-        self._init_relay()
+        #self._init_relay()
 
     def terminate(self):
         """terminate triggers the thread to stop."""
