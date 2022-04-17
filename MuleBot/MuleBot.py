@@ -1079,7 +1079,20 @@ class MuleBot:
                   self.setMotorsDirection(direction)
 
                   index = 0
-                  speed = float(cmd[1:])
+                  if len( cmd ) == 1:
+                    print ("Invalid input: ", command)
+                    print ("Remember to enter the speed.")
+                    print ("Please try again.")
+                    print
+                    continue
+
+                  try:
+                    speed = float(cmd[1:])
+                  except:
+                    print ("Invalid speed: ", cmd[1:])
+                    print ("Please try again.")
+                    continue
+
                   print("Speed: ", speed)
 
                   self.motorSpeed(speed, speed)

@@ -18,7 +18,7 @@ class Pro2():
         while self._running:
             command = input("Enter command: ")
             name = threading.currentThread().getName()
-#            print ("Producer thread:  ", name)
+            print ("Producer thread:  ", name)
 
             emptyString = ( len(command) == 0 )
             if ( emptyString ):
@@ -26,6 +26,6 @@ class Pro2():
             else:
                 _q.put(command)
 #                print (command)
-                if command[0] == 'h' or command[0] == 'H':
+                if command[0].tolower() == 'h' or command[0].tolower() == 'q':
                     _qQuit.put(command)
                     break
