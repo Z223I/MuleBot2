@@ -2,7 +2,7 @@
 
 from Adafruit_PWM_Servo_Driver import PWM
 import sys
-sys.path.append("/home/pi/pythondev/RangeBot/RangeBot")
+#sys.path.append("/home/pi/pythondev/RangeBot/RangeBot")
 #from RangeBot import RangeBot
 
 import time
@@ -13,6 +13,7 @@ import queue
 import re
 import os
 import math
+import traceback
 
 import pdb
 import logging
@@ -65,7 +66,7 @@ class MuleBot:
 
     self.pwmEnablePin       = 23 # Broadcom pin 23 was 16
     self.motor1DirectionPin = 24 # Broadcom pin 24 was 20
-    self.motor2DirectionPin = 25 # Broadcom pin 25 was 21
+    #self.motor2DirectionPin = 25 # Broadcom pin 25 was 21
 
     self.motorForward = GPIO.HIGH
     self.motorReverse = GPIO.LOW
@@ -85,7 +86,7 @@ class MuleBot:
     GPIO.setmode(GPIO.BCM) # Broadcom pin-numbering scheme
     GPIO.setup(self.pwmEnablePin,       GPIO.OUT)
     GPIO.setup(self.motor1DirectionPin, GPIO.OUT)
-    GPIO.setup(self.motor2DirectionPin, GPIO.OUT)
+    #GPIO.setup(self.motor2DirectionPin, GPIO.OUT)
 
     GPIO.output(self.pwmEnablePin,       GPIO.LOW )
 
@@ -455,6 +456,7 @@ class MuleBot:
     Usage:
         self.motorDirection(self.motor1DirectionPin, self.motorReverse)
     """
+    #traceback.print_stack()
     #  print "motorPin: ", motorPin
     #  print "direction: ",  direction
     GPIO.output(motorPin, direction)
@@ -468,14 +470,14 @@ class MuleBot:
     direction -- single character
     """
 
-    print (direction)
+    print(direction)
     if direction == 'r' or direction == 'R':
       self.motorDirection(self.motor1DirectionPin, self.motorReverse)
-      self.motorDirection(self.motor2DirectionPin, self.motorReverse)
+      #self.motorDirection(self.motor2DirectionPin, self.motorReverse)
       print ("Direction reverse")
     else:
       self.motorDirection(self.motor1DirectionPin, self.motorForward)
-      self.motorDirection(self.motor2DirectionPin, self.motorForward)
+      #self.motorDirection(self.motor2DirectionPin, self.motorForward)
       print ("Direction forward")
 
   def dcMotorLeftTurn(self, duration):
@@ -541,11 +543,12 @@ class MuleBot:
     else:
       self.motorDirection(self.motor1DirectionPin, self.motorReverse)
 
+    """
     if speed_r >= 0:
       self.motorDirection(self.motor2DirectionPin, self.motorForward)
     else :
       self.motorDirection(self.motor2DirectionPin, self.motorReverse)
-
+    """
 
 
   def motorSpeed(self, speedRPM_l, speedRPM_r):
@@ -560,7 +563,7 @@ class MuleBot:
 
     """
 
-    self.motors__Direction(speedRPM_l, speedRPM_r)
+    #self.motors__Direction(speedRPM_l, speedRPM_r)
 
     speedRPM_l = abs(speedRPM_l)
     speedRPM_r = abs(speedRPM_r)
@@ -928,8 +931,8 @@ class MuleBot:
 
               loggerMB.debug('lidarNav before execute_hunt.')
               loggerMB.debug('lidarNav before execute_hunt. range: {}, width: {}'.format(target_range, target_width))
-              angle, tgt_range, hits = \
-                  range_bot.execute_hunt(target_range, target_width)
+              #angle, tgt_range, hits = \
+              #    range_bot.execute_hunt(target_range, target_width)
               loggerMB.debug('lidarNav after execute_hunt.')
 
 #              v = self.v()
@@ -1069,7 +1072,7 @@ class MuleBot:
 
                 elif command == 'f' or command == 'r':
                   direction = command
-                  print (direction)
+                  print(direction)
                   self.setMotorsDirection(direction)
 
                   index = 0
@@ -1187,10 +1190,10 @@ class MuleBot:
 
     if _direction == 'f' or _direction == 'F':
       self.motorDirection(self.motor1DirectionPin, self.motorForward)
-      self.motorDirection(self.motor2DirectionPin, self.motorForward)
+      #self.motorDirection(self.motor2DirectionPin, self.motorForward)
     elif _direction == 'r' or _direction == 'R':
       self.motorDirection(self.motor1DirectionPin, self.motorReverse)
-      self.motorDirection(self.motor2DirectionPin, self.motorReverse)
+      #self.motorDirection(self.motor2DirectionPin, self.motorReverse)
     else:
       print ("ERROR: setMotorsDirection bad parameter: " + direction)
 
