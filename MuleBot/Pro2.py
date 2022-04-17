@@ -26,6 +26,6 @@ class Pro2():
             else:
                 _q.put(command)
 #                print (command)
-                if command[0].tolower() == 'h' or command[0].tolower() == 'q':
+                if command[0].lower() == 'h' or command[0].lower() == 'q':
                     _qQuit.put(command)
                     break
